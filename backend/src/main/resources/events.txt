@@ -1,0 +1,5 @@
+A 1 luca,salik,alex
+A 1 rosa
+A 3 shaq
+S 5 shaq,luca
+A 30 fabio

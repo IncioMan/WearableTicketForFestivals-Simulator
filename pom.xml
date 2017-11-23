@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.group14</groupId>
+  <artifactId>findyourfriend</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>findyourfriend</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <activemq.version>5.14.3</activemq.version>
+    <vaadin.version>7.7.11</vaadin.version>
+	<vaadin.plugin.version>7.7.11</vaadin.plugin.version>
+	<jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<maven.compiler.source>1.8</maven.compiler.source>
+	<maven.compiler.target>1.8</maven.compiler.target>
+	<!-- If there are no local customisations, this can also be "fetch" or "cdn" -->
+	<vaadin.widgetset.mode>local</vaadin.widgetset.mode>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-all</artifactId>
+        <version>${activemq.version}</version>
+    </dependency>
+  </dependencies>
+  
+  <modules>
+	<module>backend</module>
+	<module>frontend</module>
+  </modules>
+</project>
