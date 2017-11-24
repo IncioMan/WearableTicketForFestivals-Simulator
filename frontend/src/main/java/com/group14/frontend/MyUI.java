@@ -1,20 +1,15 @@
 package com.group14.frontend;
 
+import java.io.Serializable;
 import java.util.Random;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.Queue;
-import javax.jms.Session;
+import javax.jms.ObjectMessage;
 import javax.servlet.annotation.WebServlet;
 
-import org.apache.activemq.ActiveMQConnection;
-import org.apache.activemq.ActiveMQConnectionFactory;
-
+import com.group14.common_interface.IConstants;
+import com.group14.common_interface.MessageSimulationPayload;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -38,7 +33,7 @@ import com.vaadin.ui.VerticalLayout;
  */
 @Theme("mytheme")
 @Push
-public class MyUI extends UI implements MessageListener {
+public class MyUI extends UI {
 
 	/**
 	 * 
@@ -48,9 +43,6 @@ public class MyUI extends UI implements MessageListener {
 	private static final int GRID_HEIGHT = 60;
 	private GridLayout gridLayout;
 	private PersonDetailLayout detailLayout;
-	private Connection connection;
-	private Session session;
-	private MessageConsumer messageConsumer;
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -61,33 +53,7 @@ public class MyUI extends UI implements MessageListener {
 		content.addComponent(buildFirstLayer());
 		content.setSizeFull();
 
-//		try {
-//			listenToEvents("consumer", "pointtopoint.q");
-//		} catch (JMSException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-	}
-
-	private void listenToEvents(String clientId, String queueName) throws JMSException {
-		// create a Connection Factory
-		ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
-
-		// create a Connection
-		connection = connectionFactory.createConnection();
-		connection.setClientID(clientId);
-
-		// create a Session
-		session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
-
-		// create the Queue from which messages will be received
-		Queue queue = session.createQueue(queueName);
-
-		// create a MessageConsumer for receiving messages
-		messageConsumer = session.createConsumer(queue);
-		messageConsumer.setMessageListener(this);
-		// start the connection in order to receive messages
-		connection.start();
+		UINotifier.connect("consumer", IConstants.QUEUE_NAME, this::update);
 	}
 
 	private Component buildFirstLayer() {
@@ -104,32 +70,6 @@ public class MyUI extends UI implements MessageListener {
 
 		layout.setExpandRatio(gridLayout, 3.0f);
 		layout.setExpandRatio(detailLayout, 1.0f);
-
-		// Draw a 20x20 filled rectangle with the upper left corner
-		// in coordinate 10,10. It will be filled with the default
-		// color which is black.
-		new Thread(() -> {
-			while (true) {
-				gridLayout.removeAllComponents();
-				UI.getCurrent().access(() -> {
-					for (int i = 0; i < 10; i++) {
-						int x = new Random().nextInt(GRID_WIDTH);
-						int y = new Random().nextInt(GRID_HEIGHT);
-						Person person = new Person();
-						person.setPersonId(i + "");
-						person.setSearching(new Random().nextBoolean());
-						gridLayout.addComponent(person, x, y);
-						person.addLayoutClickListener(this::personClicked);
-					}
-				});
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}).start();
 
 		layout.setSizeFull();
 		return layout;
@@ -151,8 +91,32 @@ public class MyUI extends UI implements MessageListener {
 		private static final long serialVersionUID = 1L;
 	}
 
-	@Override
-	public void onMessage(Message message) {
-		System.out.println(message);
+	public void update(Message message) {
+		try {
+			if (!(message instanceof ObjectMessage)) {
+				return;
+			}
+			Serializable payload = ((ObjectMessage) message).getObject();
+			if (payload instanceof MessageSimulationPayload) {
+				updateMap((MessageSimulationPayload) payload);
+			}
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void updateMap(MessageSimulationPayload payload) {
+		gridLayout.removeAllComponents();
+		UI.getCurrent().access(() -> {
+			payload.getPeople().forEach(p -> {
+				Person person = new Person();
+				// person.setPersonId(i + "");
+				person.setSearching(new Random().nextBoolean());
+				gridLayout.addComponent(person, new Float(p.getPosition().getCoordinates().x + "").intValue(),
+						new Float(p.getPosition().getCoordinates().y).intValue());
+				person.addLayoutClickListener(this::personClicked);
+			});
+		});
 	}
 }

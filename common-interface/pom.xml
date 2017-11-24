@@ -2,16 +2,16 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-  	<groupId>com.group14</groupId>
-    <artifactId>findyourfriend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-  </parent>
+  	<parent>
+	  <groupId>com.group14</groupId>
+	  <artifactId>findyourfriend</artifactId>
+	    <version>0.0.1-SNAPSHOT</version>
+	</parent>
 
-  <artifactId>backend</artifactId>
+  <artifactId>common-interface</artifactId>
   <packaging>jar</packaging>
 
-  <name>backend</name>
+  <name>common-interface</name>
   <url>http://maven.apache.org</url>
 
   <properties>
@@ -25,15 +25,5 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-  	<dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-all</artifactId>
-        <version>${activemq.version}</version>
-    </dependency>
-    <dependency>
-	  	<groupId>com.group14</groupId>
-	    <artifactId>common-interface</artifactId>
-	    <version>0.0.1-SNAPSHOT</version>
-  	</dependency>
   </dependencies>
 </project>

@@ -7,18 +7,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
 
-import org.apache.activemq.ActiveMQConnection;
-import org.apache.activemq.ActiveMQConnectionFactory;
-
+import com.group14.common_interface.IConstants;
+import com.group14.common_interface.Position;
+import com.group14.common_interface.Vector2;
 import com.group14.findeyourfriend.debug.DebugLog;
-import com.group14.findeyourfriend.math.Vector2;
 
 public class Simulation {
 	private int clock;
@@ -29,21 +23,19 @@ public class Simulation {
 	private Radio radio;
 	private int simulationTime;
 	private Broker broker = new Broker();
-	private Connection connection;
-	private Session session;
-	private MessageProducer messageProducer;
+	private Notifier notifier;
 
 	public Simulation(Queue<Event> events, int simulationTime) throws JMSException {
-		createQueue("producer", "pointtopoint.q");
-		clock=0;
+		notifier = new Notifier("producer", IConstants.QUEUE_NAME);
+		clock = 0;
 		timeEvents = new HashMap<>();
-		while(!events.isEmpty()) {
+		while (!events.isEmpty()) {
 			Event nextEvent = events.poll();
 			nextEvent.setSimulation(this);
 
-			if(timeEvents.containsKey(nextEvent.getStart())){
+			if (timeEvents.containsKey(nextEvent.getStart())) {
 				timeEvents.get(nextEvent.getStart()).add(nextEvent);
-			}else{
+			} else {
 				ArrayList<Event> eventArrayList = new ArrayList<>();
 				eventArrayList.add(nextEvent);
 				timeEvents.put(nextEvent.getStart(), eventArrayList);
@@ -55,59 +47,36 @@ public class Simulation {
 		map.setSimulation(this);
 	}
 
-	public void createQueue(String clientId, String queueName) throws JMSException {
-		// create a Connection Factory
-		ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
-
-		// create a Connection
-		connection = connectionFactory.createConnection();
-		connection.setClientID(clientId);
-
-		// create a Session
-		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-		// create the Queue to which messages will be sent
-		javax.jms.Queue queue = session.createQueue(queueName);
-
-		// create a MessageProducer for sending messages
-		messageProducer = session.createProducer(queue);
-
-		// create a JMS TextMessage
-		TextMessage textMessage = session.createTextMessage("ciao");
-		messageProducer.send(textMessage);
-	}
-
 	public void run() {
 
 		// TODO implement parameter passing with Simulator
 		battery = new Battery(10000);
 		radio = new Radio(1000, 0.01, 7.0, 5);
 
-		while(clock <= simulationTime){
+		while (clock <= simulationTime) {
 			ArrayList<Event> events = timeEvents.getOrDefault(clock, new ArrayList<>());
-			for (Event e: events) {
+			for (Event e : events) {
 				e.process();
 			}
 			for (Person person : guests.values())
 				person.getBracelet().transition(clock);
 
+			// System.out.println(map.AllInBound());
 
-//            System.out.println(map.AllInBound());
-
-			if(clock % 1000 == 0){
-//                Map.clrscr();
-//                map.Print();
+			if (clock % 1000 == 0) {
+				// Map.clrscr();
+				// map.Print();
 				for (Person person : guests.values())
 					person.UpdatePosition();
+				notifier.notify(guests.values());
 			}
 			clock++;
 
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-
+			// try {
+			// Thread.sleep(1000);
+			// } catch (InterruptedException e) {
+			// e.printStackTrace();
+			// }
 
 		}
 		DebugLog.log("All events processed or simulation time has run out. Simulation finished.");

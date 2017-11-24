@@ -1,6 +1,13 @@
-package com.group14.findeyourfriend.math;
+package com.group14.common_interface;
 
-public class Vector2 {
+import java.io.Serializable;
+
+public class Vector2 implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static Vector2 Zero = new Vector2();
 
 	// Members

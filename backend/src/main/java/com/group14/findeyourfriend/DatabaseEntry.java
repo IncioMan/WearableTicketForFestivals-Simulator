@@ -6,24 +6,24 @@ package com.group14.findeyourfriend;
 // C# to Java Converter courtesy of Tangible Software Solutions.
 // Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
 //========================================================================
-public class DatabaseEntry
-{
+public class DatabaseEntry {
 	private java.time.LocalDateTime TimeStamp = java.time.LocalDateTime.MIN;
-	public final java.time.LocalDateTime getTimeStamp()
-	{
+
+	public final java.time.LocalDateTime getTimeStamp() {
 		return TimeStamp;
 	}
-	public final void setTimeStamp(java.time.LocalDateTime value)
-	{
+
+	public final void setTimeStamp(java.time.LocalDateTime value) {
 		TimeStamp = value;
 	}
-	private Position Position;
-	public final Position getPosition()
-	{
+
+	private com.group14.common_interface.Position Position;
+
+	public final com.group14.common_interface.Position getPosition() {
 		return Position;
 	}
-	public final void setPosition(Position value)
-	{
+
+	public final void setPosition(com.group14.common_interface.Position value) {
 		Position = value;
 	}
 }
