@@ -7,49 +7,53 @@ package com.group14.findeyourfriend;
 // Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
 //========================================================================
 
-public class Radio {
+public class Radio
+{
 	private double range_M;
 
-	public final double getRange_M() {
+	public final double getRange_M()
+	{
 		return range_M;
 	}
-
-	public final void setRange_M(double value) {
+	public final void setRange_M(double value)
+	{
 		range_M = value;
 	}
 
 	private RadioState State = RadioState.values()[0];
-
-	public final RadioState getState() {
+	public final RadioState getState()
+	{
 		return State;
 	}
-
-	public final void setState(RadioState value) {
+	public final void setState(RadioState value)
+	{
 		State = value;
 	}
 
-	private double _passiveConsumption;
-	private double _transmittingConsumption;
-	private double _receivingConsumption;
+	private double _passiveConsumption_mA;
+	private double _transmittingConsumption_mA;
+	private double _receivingConsumption_mA;
 
-	public Radio(double range, double passiveConsumption, double transmittingConsumption, double receivingConsumpion) {
-		_passiveConsumption = passiveConsumption;
-		_transmittingConsumption = transmittingConsumption;
-		_receivingConsumption = receivingConsumpion;
+	public Radio(double range, double passiveConsumption_mA, double transmittingConsumption_mA, double receivingConsumpion_mA)
+	{
+		_passiveConsumption_mA = passiveConsumption_mA;
+		_transmittingConsumption_mA = transmittingConsumption_mA;
+		_receivingConsumption_mA = receivingConsumpion_mA;
 		range_M = range;
 		setState(RadioState.Passive);
 	}
-
-	public final double getConsumption() {
-		switch (getState()) {
-		case Passive:
-			return _passiveConsumption;
-		case Transmitting:
-			return _transmittingConsumption;
-		case Receiving:
-			return _receivingConsumption;
-		default:
-			return 0;
+	public final double getConsumption()
+	{
+		switch (getState())
+		{
+			case Passive:
+				return _passiveConsumption_mA;
+			case Transmitting:
+				return _transmittingConsumption_mA;
+			case Receiving:
+				return _receivingConsumption_mA;
+			default:
+				return 0;
 		}
 	}
 

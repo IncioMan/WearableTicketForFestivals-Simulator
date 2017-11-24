@@ -41,15 +41,12 @@ public class StateMachineProcess {
 
 		@Override
 		public boolean equals(Object o) {
-			if (this == o)
-				return true;
-			if (o == null || getClass() != o.getClass())
-				return false;
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
 
 			StateTransition that = (StateTransition) o;
 
-			if (_currentState != that._currentState)
-				return false;
+			if (_currentState != that._currentState) return false;
 			return _command == that._command;
 		}
 
@@ -62,8 +59,7 @@ public class StateMachineProcess {
 	}
 
 	/**
-	 * Constructor where we set up the statetransitions based on currentstate,
-	 * command -> next state
+	 * Constructor where we set up the statetransitions based on currentstate, command -> next state
 	 */
 	public StateMachineProcess() {
 		setCurrentState(ProcessState.SleepState);
@@ -76,8 +72,7 @@ public class StateMachineProcess {
 		_transitions.put(new StateTransition(ProcessState.UpdateState, Command.StartSearch), ProcessState.SearchState);
 		_transitions.put(new StateTransition(ProcessState.SleepState, Command.TimerF), ProcessState.LedState);
 		_transitions.put(new StateTransition(ProcessState.LedState, Command.Next), ProcessState.SleepState);
-		_transitions.put(new StateTransition(ProcessState.SearchState, Command.FriendNotFound),
-				ProcessState.SleepState);
+		_transitions.put(new StateTransition(ProcessState.SearchState, Command.FriendNotFound), ProcessState.SleepState);
 		_transitions.put(new StateTransition(ProcessState.SearchState, Command.FriendFound), ProcessState.LedState);
 		_transitions.put(new StateTransition(ProcessState.CommState, Command.TimerUp), ProcessState.UpdateState);
 		_transitions.put(new StateTransition(ProcessState.UpdateState, Command.Next), ProcessState.SleepState);
@@ -86,10 +81,8 @@ public class StateMachineProcess {
 	public final ProcessState GetNext(Command command) {
 		StateTransition transition = new StateTransition(getCurrentState(), command);
 		ProcessState nextState = _transitions.get(transition);
-		if (nextState != null)
-			return nextState;
-		else
-			throw new RuntimeException("Invalid transition: " + getCurrentState() + " -> " + command);
+		if (nextState != null) return nextState;
+		else throw new RuntimeException("Invalid transition: " + getCurrentState() + " -> " + command);
 	}
 
 	public final ProcessState MoveNext(Command command) {

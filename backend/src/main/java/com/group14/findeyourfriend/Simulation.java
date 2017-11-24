@@ -35,15 +35,15 @@ public class Simulation {
 
 	public Simulation(Queue<Event> events, int simulationTime) throws JMSException {
 		createQueue("producer", "pointtopoint.q");
-		clock = 0;
+		clock=0;
 		timeEvents = new HashMap<>();
-		while (!events.isEmpty()) {
+		while(!events.isEmpty()) {
 			Event nextEvent = events.poll();
 			nextEvent.setSimulation(this);
 
-			if (timeEvents.containsKey(nextEvent.getStart())) {
+			if(timeEvents.containsKey(nextEvent.getStart())){
 				timeEvents.get(nextEvent.getStart()).add(nextEvent);
-			} else {
+			}else{
 				ArrayList<Event> eventArrayList = new ArrayList<>();
 				eventArrayList.add(nextEvent);
 				timeEvents.put(nextEvent.getStart(), eventArrayList);
@@ -80,30 +80,35 @@ public class Simulation {
 	public void run() {
 
 		// TODO implement parameter passing with Simulator
-		battery = new Battery(1000);
-		radio = new Radio(1000, 0.01, 50, 5);
+		battery = new Battery(10000);
+		radio = new Radio(1000, 0.01, 7.0, 5);
 
-		while (clock <= simulationTime) {
-			ArrayList<Event> events = timeEvents.getOrDefault(clock, new ArrayList<Event>());
-			for (Event e : events) {
+		while(clock <= simulationTime){
+			ArrayList<Event> events = timeEvents.getOrDefault(clock, new ArrayList<>());
+			for (Event e: events) {
 				e.process();
 			}
+			for (Person person : guests.values())
+				person.getBracelet().transition(clock);
 
+
+//            System.out.println(map.AllInBound());
+
+			if(clock % 1000 == 0){
+//                Map.clrscr();
+//                map.Print();
+				for (Person person : guests.values())
+					person.UpdatePosition();
+			}
 			clock++;
 
-			// System.out.println(map.AllInBound());
-			map.Print();
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
 
-			for (Person person : guests.values())
-				person.updatePosition();
 
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-			Map.clrscr();
 		}
 		DebugLog.log("All events processed or simulation time has run out. Simulation finished.");
 	}

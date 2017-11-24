@@ -61,12 +61,12 @@ public class MyUI extends UI implements MessageListener {
 		content.addComponent(buildFirstLayer());
 		content.setSizeFull();
 
-		try {
-			listenToEvents("consumer", "pointtopoint.q");
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			listenToEvents("consumer", "pointtopoint.q");
+//		} catch (JMSException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	private void listenToEvents(String clientId, String queueName) throws JMSException {
@@ -123,7 +123,7 @@ public class MyUI extends UI implements MessageListener {
 					}
 				});
 				try {
-					Thread.sleep(3000);
+					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

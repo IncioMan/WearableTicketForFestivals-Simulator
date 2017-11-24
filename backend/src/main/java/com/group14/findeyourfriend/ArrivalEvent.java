@@ -3,7 +3,7 @@ package com.group14.findeyourfriend;
 import java.util.List;
 
 public class ArrivalEvent extends Event {
-	//
+
 	private List<Person> peopleComing;
 
 	@Override
@@ -11,7 +11,7 @@ public class ArrivalEvent extends Event {
 		sim.newGuestsArrived(peopleComing);
 	}
 
-	public void setPeopleComing(List<Person> comers) {
-		this.peopleComing = comers;
+	public void setPeopleComing(List<Person> peopleComing) {
+		this.peopleComing = peopleComing;
 	}
 }

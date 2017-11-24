@@ -11,7 +11,8 @@ import java.util.Set;
 // Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
 //========================================================================
 
-public class Map {
+public class Map
+{
 	private static final char SIDE_BORDER_CHAR = '|';
 	private static final char TOP_BORDER_CHAR = '-';
 
@@ -73,32 +74,34 @@ public class Map {
 		System.out.println(bottomBorder);
 	}
 
-	private void populateWithSpaces(char[] arr) {
-		for (int i = 0; i < arr.length; i++) {
+	private void populateWithSpaces(char[] arr)
+	{
+		for (int i = 0; i < arr.length; i++)
+		{
 			arr[i] = ' ';
 		}
 	}
 
-	public final boolean AllInBound() {
-		for (Person p : sim.getGuests()) {
-			if (p.getPosition().getCoordinates().x < 0 || p.getPosition().getCoordinates().x > Constants.MAX_WIDTH
-					|| p.getPosition().getCoordinates().y < 0
-					|| p.getPosition().getCoordinates().y > Constants.MAX_HEIGHT) {
+	public final boolean AllInBound()
+	{
+		for (Person p : sim.getGuests())
+		{
+			if (p.getPosition().getCoordinates().x < 0 || p.getPosition().getCoordinates().x > Constants.MAX_WIDTH || p.getPosition().getCoordinates().y < 0 || p.getPosition().getCoordinates().y > Constants.MAX_HEIGHT)
+			{
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public static void clrscr() {
-		// Clears Screen in java
+	public static void clrscr(){
+		//Clears Screen in java
 		try {
 			if (System.getProperty("os.name").contains("Windows"))
 				new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
 			else
 				Runtime.getRuntime().exec("clear");
-		} catch (IOException | InterruptedException ex) {
-		}
+		} catch (IOException | InterruptedException ex) {}
 	}
 
 	public int getWidth() {
