@@ -10,8 +10,7 @@ public class Mover extends HorizontalLayout {
 	private static final long serialVersionUID = 1L;
 
 	public Mover() {
-		setWidth("10px");
-		setHeight("10px");
+		setSizeFull();
 
 		addStyleName(ICustomStyles.MOVER);
 	}

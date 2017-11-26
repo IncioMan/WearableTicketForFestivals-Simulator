@@ -1,11 +1,7 @@
 package com.group14.frontend;
 
-import java.io.Serializable;
 import java.util.Random;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.ObjectMessage;
 import javax.servlet.annotation.WebServlet;
 
 import com.group14.common_interface.IConstants;
@@ -39,10 +35,11 @@ public class MyUI extends UI {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final int GRID_WIDTH = 120;
+	private static final int GRID_WIDTH = 180;
 	private static final int GRID_HEIGHT = 60;
 	private GridLayout gridLayout;
 	private PersonDetailLayout detailLayout;
+	private UINotifier notifier;
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -53,7 +50,8 @@ public class MyUI extends UI {
 		content.addComponent(buildFirstLayer());
 		content.setSizeFull();
 
-		UINotifier.connect("consumer", IConstants.QUEUE_NAME, this::update);
+		notifier = new UINotifier();
+		notifier.connect("consumer", IConstants.QUEUE_NAME, this::update);
 	}
 
 	private Component buildFirstLayer() {
@@ -62,8 +60,7 @@ public class MyUI extends UI {
 		layout.addComponent(gridLayout = new GridLayout(GRID_WIDTH, GRID_HEIGHT));
 		gridLayout.addStyleName(ICustomStyles.BORDER);
 		gridLayout.addStyleName(ICustomStyles.FIELD);
-		gridLayout.setWidth(GRID_WIDTH * 10 + "px");
-		gridLayout.setHeight(GRID_HEIGHT * 10 + "px");
+		gridLayout.setSizeFull();
 		// layout.addStyleName(ValoTheme.BORDE);
 
 		layout.addComponent(detailLayout = new PersonDetailLayout());
@@ -71,6 +68,7 @@ public class MyUI extends UI {
 		layout.setExpandRatio(gridLayout, 3.0f);
 		layout.setExpandRatio(detailLayout, 1.0f);
 
+		layout.setSpacing(true);
 		layout.setSizeFull();
 		return layout;
 	}
@@ -91,32 +89,29 @@ public class MyUI extends UI {
 		private static final long serialVersionUID = 1L;
 	}
 
-	public void update(Message message) {
-		try {
-			if (!(message instanceof ObjectMessage)) {
-				return;
-			}
-			Serializable payload = ((ObjectMessage) message).getObject();
-			if (payload instanceof MessageSimulationPayload) {
-				updateMap((MessageSimulationPayload) payload);
-			}
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void update(MessageSimulationPayload message) {
+		updateMap(message);
 	}
 
 	private void updateMap(MessageSimulationPayload payload) {
 		gridLayout.removeAllComponents();
-		UI.getCurrent().access(() -> {
-			payload.getPeople().forEach(p -> {
-				Person person = new Person();
-				// person.setPersonId(i + "");
-				person.setSearching(new Random().nextBoolean());
-				gridLayout.addComponent(person, new Float(p.getPosition().getCoordinates().x + "").intValue(),
-						new Float(p.getPosition().getCoordinates().y).intValue());
-				person.addLayoutClickListener(this::personClicked);
-			});
-		});
+		try {
+			final UI ui = MyUI.this.getUI();
+			if (ui != null) {
+				ui.access(() -> {
+					payload.getPeople().forEach(p -> {
+						Person person = new Person();
+						// person.setPersonId(i + "");
+						person.setSearching(new Random().nextBoolean());
+						gridLayout.addComponent(person, new Float(p.getPosition().getCoordinates().x + "").intValue(),
+								new Float(p.getPosition().getCoordinates().y).intValue());
+						person.addLayoutClickListener(this::personClicked);
+					});
+					ui.push();
+				});
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

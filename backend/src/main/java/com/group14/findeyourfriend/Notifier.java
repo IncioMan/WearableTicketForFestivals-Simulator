@@ -11,6 +11,7 @@ import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import com.group14.common_interface.MessageSimulationPayload;
 import com.group14.common_interface.PersonDto;
@@ -20,9 +21,11 @@ public class Notifier {
 	private MessageProducer messageProducer;
 	private DtoConverter converter;
 	private Session session;
+	private ObjectMapper mapper;
 
 	public Notifier() {
 		converter = new DtoConverter();
+		mapper = new ObjectMapper();
 	}
 
 	public Notifier(String clientId, String queueName) {
@@ -69,7 +72,7 @@ public class Notifier {
 		payload.setPeople(dtos);
 
 		try {
-			messageProducer.send(session.createObjectMessage(payload));
+			messageProducer.send(session.createTextMessage(mapper.writeValueAsString(payload)));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

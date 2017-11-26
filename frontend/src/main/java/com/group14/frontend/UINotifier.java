@@ -1,19 +1,38 @@
 package com.group14.frontend;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Queue;
 import javax.jms.Session;
+import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.group14.common_interface.MessageSimulationPayload;
 
 public class UINotifier {
 	private Session session;
 	private MessageConsumer messageConsumer;
+	private ObjectMapper mapper;
+	private List<Consumer<MessageSimulationPayload>> payloadConsumers;
+
+	public UINotifier() {
+		mapper = new ObjectMapper();
+		payloadConsumers = new ArrayList<>();
+	}
 
 	public void createQueue(String clientId, String queueName) throws JMSException {
 		System.setProperty("org.apache.activemq.SERIALIZABLE_PACKAGES", "*");
@@ -47,7 +66,7 @@ public class UINotifier {
 		}
 	}
 
-	public static void connect(String clientId, String queueName, MessageListener listener) {
+	public void connect(String clientId, String queueName, Consumer<MessageSimulationPayload> payloadConsumer) {
 		try {
 			// create a Connection Factory
 			ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
@@ -63,12 +82,41 @@ public class UINotifier {
 			Queue queue = session.createQueue(queueName);
 
 			// create a MessageProducer for sending messages
-			MessageConsumer messageConsumer = session.createConsumer(queue);
+			messageConsumer = session.createConsumer(queue);
 
 			connection.start();
 
-			messageConsumer.setMessageListener(listener);
+			messageConsumer.setMessageListener(this::processMessage);
+
+			payloadConsumers.add(payloadConsumer);
 		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void processMessage(Message message) {
+		if (!(message instanceof TextMessage)) {
+			return;
+		}
+
+		MessageSimulationPayload payload;
+		try {
+			payload = mapper.readValue(((TextMessage) message).getText(), MessageSimulationPayload.class);
+			payloadConsumers.forEach(c -> {
+				c.accept(payload);
+			});
+			Thread.sleep(100);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

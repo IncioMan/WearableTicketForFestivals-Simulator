@@ -10,6 +10,10 @@ public class MessageSimulationPayload implements Serializable {
 	private static final long serialVersionUID = 6954765546191136459L;
 	private List<PersonDto> people;
 
+	public MessageSimulationPayload() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public List<PersonDto> getPeople() {
 		return people;
 	}

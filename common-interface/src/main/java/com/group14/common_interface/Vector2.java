@@ -25,6 +25,22 @@ public class Vector2 implements Serializable {
 		this.y = y;
 	}
 
+	public float getX() {
+		return x;
+	}
+
+	public void setX(float x) {
+		this.x = x;
+	}
+
+	public float getY() {
+		return y;
+	}
+
+	public void setY(float y) {
+		this.y = y;
+	}
+
 	// Compare two vectors
 	public boolean equals(Vector2 other) {
 		return (this.x == other.x && this.y == other.y);

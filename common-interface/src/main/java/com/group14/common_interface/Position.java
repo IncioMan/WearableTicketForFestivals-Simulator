@@ -7,14 +7,18 @@ public class Position implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Vector2 Coordinates = new Vector2();
+	private Vector2 coordinates = new Vector2();
 
 	public final Vector2 getCoordinates() {
-		return Coordinates;
+		return coordinates;
+	}
+
+	public Position() {
+		// TODO Auto-generated constructor stub
 	}
 
 	public final void setCoordinates(Vector2 value) {
-		Coordinates = value;
+		coordinates = value;
 	}
 
 	public Position(float X, float Y) {
@@ -51,11 +55,11 @@ public class Position implements Serializable {
 
 		Position position = (Position) o;
 
-		return Coordinates != null ? Coordinates.equals(position.Coordinates) : position.Coordinates == null;
+		return coordinates != null ? coordinates.equals(position.coordinates) : position.coordinates == null;
 	}
 
 	@Override
 	public int hashCode() {
-		return Coordinates != null ? Coordinates.hashCode() : 0;
+		return coordinates != null ? coordinates.hashCode() : 0;
 	}
 }

@@ -40,8 +40,7 @@
   }
   .field {
 	  .v-gridlayout-slot {
-	  	width: 10px !important;
-	  	height: 10px !important;
+	  	
 	  }
    }
   .mover {
@@ -51,6 +50,8 @@
   }
   .mover:hover {
   	cursor: pointer;
+  	width: 50px !important;
+  	height: 50px !important;
   }
   .searching {
   	background: LawnGreen;
