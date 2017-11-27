@@ -1,11 +1,12 @@
 var bubbles = [];
-var person_width = 20;
-var person_height = 20;
+var person_width = 40;
+var person_height = 40;
 var guests = [];
 
 class Person{
 
-  constructor(X, Y, broadcasting){
+  constructor(id, X, Y, broadcasting){
+    this.id = id;
     this.X = X;
     this.Y = Y;
     this.broadcasting = broadcasting;
@@ -16,6 +17,10 @@ class Person{
       stroke('black');
       fill(this.col);
       ellipse(this.X,this.Y,person_width,person_height);
+      noStroke();
+      fill('black');
+      textSize(20);
+      text(this.id, this.X - person_width/4, this.Y - person_height/4, person_width, person_height);
       if(this.broadcasting){
         noFill();
         stroke('#40C4FF');
@@ -28,9 +33,7 @@ class Person{
     clicked(){
       var d = dist(mouseX, mouseY, this.X, this.Y);
       if(d < person_width){
-        this.col = 'purple';
-      }else{
-        this.col = 'white';
+        alert("You clicked me at " + this.X);
       }
     }
 }
@@ -56,11 +59,11 @@ function mousePressed(){
 window.setInterval(function(){
   var url = 'http://localhost:8080/guests'
   loadJSON(url, drawGuests);
-}, 10);
+}, 90);
 
 function drawGuests(people) {
   guests = [];
   people.forEach(function(p){
-      guests.push(new Person(p.position.coordinates.x, p.position.coordinates.y, true));
+      guests.push(new Person(p.id, p.position.coordinates.x, p.position.coordinates.y, random(1) > .5));
   });
 }
