@@ -10,6 +10,7 @@ public class DtoConverter {
 		}
 
 		PersonDto dto = new PersonDto();
+		dto.setId(model.getName());
 		dto.setPosition(model.getPosition());
 		return dto;
 	}

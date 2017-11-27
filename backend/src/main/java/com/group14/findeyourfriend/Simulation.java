@@ -78,7 +78,7 @@ public class Simulation {
 				notifier.notify(guests.values());
 				System.out.println("UI Notified");
 				try {
-					Thread.sleep(10);
+					Thread.sleep(90);
 				} catch (InterruptedException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
