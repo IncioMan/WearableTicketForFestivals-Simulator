@@ -1,13 +1,17 @@
 package com.group14.findeyourfriend;
 
 public class Person extends Mover {
-	private final String name;
+	private String name;
 	private Bracelet bracelet;
 	private int id;
 
 	public Person(String name, int id) {
 		this.id = id;
 		this.name = name;
+	}
+
+	public Person() {
+		super();
 	}
 
 	public final int getId() {
@@ -20,6 +24,10 @@ public class Person extends Mover {
 
 	public final void setBracelet(Bracelet value) {
 		bracelet = value;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	@Override

@@ -14,4 +14,8 @@ public class ArrivalEvent extends Event {
 	public void setPeopleComing(List<Person> peopleComing) {
 		this.peopleComing = peopleComing;
 	}
+
+	public List<Person> getPeopleComing() {
+		return peopleComing;
+	}
 }

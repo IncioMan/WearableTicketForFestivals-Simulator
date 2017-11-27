@@ -7,13 +7,14 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 
-import javax.jms.JMSException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import com.group14.common_interface.IConstants;
 import com.group14.common_interface.Position;
 import com.group14.common_interface.Vector2;
 import com.group14.findeyourfriend.debug.DebugLog;
 
+@Component
 public class Simulation {
 	private int clock;
 	private java.util.Map<Integer, Person> guests;
@@ -23,10 +24,16 @@ public class Simulation {
 	private Radio radio;
 	private int simulationTime;
 	private Broker broker = new Broker();
+
+	@Autowired
 	private Notifier notifier;
 
-	public Simulation(Queue<Event> events, int simulationTime) throws JMSException {
-		notifier = new Notifier("producer", IConstants.QUEUE_NAME);
+	public Simulation() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public void init(Queue<Event> events, int simulationTime) {
+		// notifier = new Notifier("producer", IConstants.QUEUE_NAME);
 		clock = 0;
 		timeEvents = new HashMap<>();
 		while (!events.isEmpty()) {
@@ -69,6 +76,13 @@ public class Simulation {
 				for (Person person : guests.values())
 					person.UpdatePosition();
 				notifier.notify(guests.values());
+				System.out.println("UI Notified");
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 			clock++;
 
@@ -92,8 +106,8 @@ public class Simulation {
 					new Position(ThreadLocalRandom.current().nextInt(Constants.MIN_WIDTH, Constants.MAX_WIDTH),
 							ThreadLocalRandom.current().nextInt(Constants.MIN_HEIGHT, Constants.MAX_HEIGHT)));
 
-			int randomX = ThreadLocalRandom.current().nextInt(-5, 5 + 1);
-			int randomY = ThreadLocalRandom.current().nextInt(-5, 5 + 1);
+			int randomX = ThreadLocalRandom.current().nextInt(-50, 50 + 10);
+			int randomY = ThreadLocalRandom.current().nextInt(-50, 5 + 10);
 			float x = (float) randomX / 10;
 			float y = (float) randomY / 10;
 			guest.setAcceleration(new Vector2(x, y));
