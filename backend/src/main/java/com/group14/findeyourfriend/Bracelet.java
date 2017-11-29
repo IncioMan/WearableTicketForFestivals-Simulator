@@ -1,9 +1,13 @@
 package com.group14.findeyourfriend;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.group14.common_interface.Position;
 import com.group14.common_interface.Vector2;
+import com.group14.findeyourfriend.chart.Chart;
+import com.group14.findeyourfriend.debug.DebugLog;
+import javafx.scene.chart.XYChart;
 
 //========================================================================
 // This conversion was produced by the Free Edition of
@@ -15,15 +19,10 @@ public class Bracelet {
 	private boolean guiding;
 	private boolean found;
 	private final StateMachineProcess _stateMachine = new StateMachineProcess();
-	private int _timerCpDelay;
-	private int _timerFDelay;
 	private boolean _timerFRun;
-	private int _timerLedDelay;
 	private boolean _timerLedRun;
-	private int _timerRDelay;
 	private boolean _timerRRun;
 	private boolean _timerUpRun;
-	private int _timerUpDelay;
 	private Broker _broker;
 	private final HashMap<Integer, DatabaseEntry> _dataBase = new HashMap<Integer, DatabaseEntry>();
 
@@ -32,30 +31,24 @@ public class Bracelet {
 
 	private Battery battery;
 	private Radio radio;
+	private CPU cpu;
 	// TODO implement screen
 	private Person person;
 	private Person _lookForPerson;
 	private double _proximity = 2.0;
-	private double cpuCurrentSleep_mA;
-	private double cpuCurrentRun_mA;
 	private double broadcastTime;
 	private double updateLedTime;
 	private double visualFeedBackCurrent_mA;
 	private double visualFeedBackOnTime;
 
-	public Bracelet(Battery b, Radio r, Person person) {
+	public Bracelet(Battery b, Radio r, CPU c, Person person) {
 		battery = b;
 		radio = r;
 		this.person = person;
-		_timerFDelay = 500;
-		_timerCpDelay = 10000;
-		_timerLedDelay = 8000;
-		_timerUpDelay = 1000;
-		_timerRDelay = 500;
-		cpuCurrentSleep_mA = 0.0002;
-		cpuCurrentRun_mA = 0.35;
+		this.cpu = c;
+
 		broadcastTime = 0.1;
-		updateLedTime = 0.1;
+		updateLedTime = 0.0001;
 		visualFeedBackCurrent_mA = 20;
 		visualFeedBackOnTime = 8000;
 	}
@@ -90,7 +83,7 @@ public class Bracelet {
 					if (_dataBase.containsKey(_lookForPerson.getId())) {
 						DatabaseEntry dbEntry = _dataBase.get(_lookForPerson.getId());
 						if (person.getPosition().DistanceTo(dbEntry.getPosition()) > _proximity) {
-							battery.DecrementEnergy(cpuCurrentRun_mA, updateLedTime);// Decrement battery from CPU time
+							battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);// Decrement battery from CPU time
 							person.GoTowards(dbEntry.getPosition());
 							setFound(false);
 							setGuiding(true);
@@ -121,7 +114,7 @@ public class Bracelet {
 				battery.DecrementEnergy(visualFeedBackCurrent_mA, visualFeedBackOnTime);// Decrement battery from
 																						// showing visuals LED/Eink or
 																						// whatever
-				battery.DecrementEnergy(cpuCurrentRun_mA, updateLedTime);// Decrement battery from CPU time
+				battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);// Decrement battery from CPU time
 			}
 			break;
 		case FriendFound: // When friend was found in the database.
@@ -141,17 +134,17 @@ public class Bracelet {
 		_timerUpRun = true;
 		_broker.DoBroadcast(this);
 
-		battery.DecrementEnergy(cpuCurrentRun_mA, _timerUpDelay);// Decrement battery from CPU for the entire broadcast
-		radio.setState(RadioState.Transmitting);
-		battery.DecrementEnergy(radio.getConsumption(), broadcastTime);// Decrement from radio for single broadcast
-		radio.setState(RadioState.Passive);
+		battery.DecrementEnergy(cpu.cpuCurrentBroadcastAvg_mA, cpu.timerUpDelay);// Decrement battery from CPU for the entire broadcast
+//		radio.setState(RadioState.Transmitting);
+//		battery.DecrementEnergy(radio.getConsumption(), broadcastTime);// Decrement from radio for single broadcast
+//		radio.setState(RadioState.Passive);
 
 		DebugLog.log(person.getId() + ": Broadcasting, collecting recent and relaying recent");
 	}
 
 	private void UpdateState() {
 		DebugLog.log(person.getId() + ": Updating locations");
-		battery.DecrementEnergy(cpuCurrentRun_mA, 1);
+		battery.DecrementEnergy(cpu.cpuCurrentRun_mA, 1000);
 		// Some logic needed here
 		_stateMachine.MoveNext(Command.Next);
 	}
@@ -161,7 +154,7 @@ public class Bracelet {
 		synchronized (_dbLock) {
 			DebugLog.log(person.getId() + ": Looking up location in my DB");
 			if (_lookForPerson != null) {
-				battery.DecrementEnergy(cpuCurrentRun_mA, 1);
+				battery.DecrementEnergy(cpu.cpuCurrentRun_mA, 1000);
 				if (_dataBase.containsKey(_lookForPerson.getId())) {
 					setGuiding(true);
 					setFound(false);
@@ -182,7 +175,7 @@ public class Bracelet {
 	private void OnTimerCp() {
 		synchronized (_stateLock) {
 			if (_stateMachine.getCurrentState() == ProcessState.SleepState) {
-				DebugLog.log(person.getId() + ": OnTimerCp");
+				DebugLog.logTimer(person.getId() + ": OnTimerCp");
 				_stateMachine.MoveNext(Command.TimerCp);
 				RunBracelet();
 			}
@@ -195,7 +188,7 @@ public class Bracelet {
 	private void OnTimerF() {
 		synchronized (_stateLock) {
 			if (_stateMachine.getCurrentState() == ProcessState.SleepState) {
-				DebugLog.log(person.getId() + ": OnTimerF");
+				DebugLog.logTimer(person.getId() + ": OnTimerF");
 				if (!IsFound() && IsGuiding()) {
 					_stateMachine.MoveNext(Command.TimerF); // Go to change LEDS
 					RunBracelet();
@@ -210,7 +203,7 @@ public class Bracelet {
 	private void OnTimerLed() {
 		synchronized (_stateLock) {
 			if (_stateMachine.getCurrentState() == ProcessState.SleepState) {
-				DebugLog.log(person.getId() + ": OnTimerLed");
+				DebugLog.logTimer(person.getId() + ": OnTimerLed");
 				if (IsGuiding()) {
 					_stateMachine.MoveNext(Command.TimerLed); // Go to Update Leds according to database
 					RunBracelet();
@@ -226,11 +219,11 @@ public class Bracelet {
 	private void OnTimerR() {
 		synchronized (_stateLock) {
 			if (_stateMachine.getCurrentState() == ProcessState.CommState) {
-				DebugLog.log(person.getId() + ": Rebroadcast");
+				DebugLog.logTimer(person.getId() + ": Rebroadcast");
 				_broker.DoBroadcast(this);
-				radio.setState(RadioState.Transmitting);
-				battery.DecrementEnergy(radio.getConsumption(), broadcastTime);
-				radio.setState(RadioState.Passive);
+//				radio.setState(RadioState.Transmitting);
+//				battery.DecrementEnergy(radio.getConsumption(), broadcastTime);
+//				radio.setState(RadioState.Passive);
 				// RunBracelet();
 			}
 		}
@@ -246,7 +239,7 @@ public class Bracelet {
 		// _timerR.cancel(); // Stop the rebroadcast timer
 		synchronized (_stateLock) {
 			if (_stateMachine.getCurrentState() == ProcessState.CommState) {
-				DebugLog.log(person.getId() + ": OnTimerUp");
+				DebugLog.logTimer(person.getId() + ": OnTimerUp");
 				_stateMachine.MoveNext(Command.TimerUp);
 				RunBracelet();
 			}
@@ -276,7 +269,7 @@ public class Bracelet {
 			databaseEnty.setPosition(position);
 			databaseEnty.setTimeStamp(java.time.LocalDateTime.now());
 			_dataBase.put(sender.person.getId(), databaseEnty); // add or overwrite
-			DebugLog.log(person.getId() + ": HEARD IT FROM " + sender.person.getId());
+			DebugLog.logTimer(person.getId() + ": HEARD IT FROM " + sender.person.getId());
 		}
 	}
 
@@ -314,29 +307,32 @@ public class Bracelet {
 	}
 
 	public void transition(int clock) {
-		if (clock % _timerCpDelay == 0) {
+
+		if (clock % cpu.timerCpDelay == 0) {
 			// Goto Communication phase
 			OnTimerCp();
 		}
-		if (clock % _timerFDelay == 0 && _timerFRun) {
+		if (clock % cpu.timerFDelay == 0 && _timerFRun) {
 			// Goto
 			OnTimerF();
 		}
-		if (clock % _timerRDelay == 0 && _timerRRun) {
+		if (clock % cpu.timerRDelay == 0 && _timerRRun) {
 			// Rebroadcast
 			OnTimerR();
 		}
-		if (clock % _timerUpDelay == 0 && _timerUpRun) {
+		if (clock % cpu.timerUpDelay == 0 && _timerUpRun) {
 			OnTimerUp();
 		}
-		if (clock % _timerLedDelay == 0 && _timerLedRun) {
+		if (clock % cpu.timerLedDelay == 0 && _timerLedRun) {
 			OnTimerLed();
 		}
+//		else battery.DecrementEnergy(cpu.cpuCurrentSleep_mA, 0.001);
+
 		if (clock % 60000 == 0) {
-			// Chart.DataPoints.add(new XYChart.Data(clock / 60000,
-			// battery.getEnergyLeft())); // every "minute" new
-			// datapoint
-		}
+            ArrayList<XYChart.Data> dataPoints = Chart.DataPointsMap.getOrDefault(person.getId(),  new ArrayList<>());
+			dataPoints.add(new XYChart.Data(clock / 60000, battery.getEnergyLeft())); // every "minute" new datapoint
+            Chart.DataPointsMap.putIfAbsent(person.getId(), dataPoints);
+        }
 	}
 
 }

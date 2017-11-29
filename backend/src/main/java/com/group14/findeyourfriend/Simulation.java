@@ -22,6 +22,7 @@ public class Simulation {
 	private Map map;
 	private Battery battery;
 	private Radio radio;
+	private CPU cpu;
 	private int simulationTime;
 	private Broker broker = new Broker();
 
@@ -54,11 +55,12 @@ public class Simulation {
 		map.setSimulation(this);
 	}
 
-	public void run() {
-
+	public void run(Parameters parameters) {
+		this.radio = parameters.radio;
+		this.cpu = parameters.cpu;
 		// TODO implement parameter passing with Simulator
-		battery = new Battery(10000);
-		radio = new Radio(1000, 0.01, 7.0, 5);
+		battery = new Battery(225); // Coincell battery
+//		radio = new Radio(1000, 0.01, 7.0, 5);
 
 		while (clock <= simulationTime) {
 			ArrayList<Event> events = timeEvents.getOrDefault(clock, new ArrayList<>());
@@ -75,14 +77,15 @@ public class Simulation {
 				// map.Print();
 				for (Person person : guests.values())
 					person.UpdatePosition();
-				notifier.notify(guests.values());
-				System.out.println("UI Notified");
-				try {
-					Thread.sleep(90);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+//				notifier.notify(guests.values());
+//				System.out.println("UI Notified");
+
+//				try {
+//					Thread.sleep(90);
+//				} catch (InterruptedException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
 			}
 			clock++;
 
@@ -98,7 +101,7 @@ public class Simulation {
 
 	public void newGuestsArrived(List<Person> newGuests) {
 		for (Person guest : newGuests) {
-			Bracelet bracelet = new Bracelet(battery, radio, guest);
+			Bracelet bracelet = new Bracelet(new Battery(battery.getCapacity_mAh()), radio, cpu,  guest);
 			bracelet.Subscribe(broker);
 			guest.setBracelet(bracelet);
 

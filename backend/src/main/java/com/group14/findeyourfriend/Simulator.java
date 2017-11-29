@@ -31,10 +31,12 @@ public class Simulator {
 	@Scheduled(fixedDelay = 15000)
 	public void start() {
 		try {
-			InputStream stream = Simulator.class.getClassLoader().getResourceAsStream("events.txt");
-			Queue<Event> events = EventParser.parse(stream);
-			simulation.init(events, 864000000);// Simulate 10 days in ms
-			simulation.run();
+			InputStream eventStream = Simulator.class.getClassLoader().getResourceAsStream("events.txt");
+			InputStream paramStream = Simulator.class.getClassLoader().getResourceAsStream("params.txt");
+			Queue<Event> events = EventParser.parse(eventStream);
+			Queue<Parameters> params = ParameterParser.parse(paramStream);
+			simulation.init(events, 86400000);// Simulate 1 days in ms
+			simulation.run(params.poll());
 			Chart.main(new String[0]);// Show chart
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -37,10 +37,10 @@ public class Battery
 		energyLeft = capacity_mAh;
 	}
 
-	public final void DecrementEnergy(double current_mA, double time_S)
+	public final void DecrementEnergy(double current_mA, double time_ms)
 	{
-		// Q = I*t (Charge(C) equals Current(A) times time(s)) then to convert to mAh we divide by 3600s/h
-		double mAh = (current_mA * time_S) / 3600;
+		// Q = I*t (Charge(C) equals Current(A) times time(s)) then to convert to mAh we divide by 3600000ms/h
+		double mAh = (current_mA * time_ms) / 3600000;
 		energyLeft = energyLeft - mAh;
 	}
 }

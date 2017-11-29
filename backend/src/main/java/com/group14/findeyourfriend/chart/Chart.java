@@ -8,6 +8,7 @@ import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class Chart extends Application {
@@ -17,7 +18,8 @@ public class Chart extends Application {
 	public static String yLabel = "Battery";
 	public static String ChartTitle = "Battery Consumption over time";
 	public static String SeriesName = "Time";
-	public static ArrayList<XYChart.Data> DataPoints = new ArrayList<>();
+//	public static ArrayList<XYChart.Data> DataPoints = new ArrayList<>();
+	public static HashMap<Integer, ArrayList<XYChart.Data>> DataPointsMap = new HashMap<>();
 	@Override public void start(Stage stage) {
 		stage.setTitle(Title);
 		//defining the axes
@@ -31,10 +33,17 @@ public class Chart extends Application {
 
 		lineChart.setTitle(ChartTitle);
 		//defining a series
-		XYChart.Series series = new XYChart.Series();
-		series.setName(SeriesName);
+        ArrayList<XYChart.Series> seriesArrayList = new ArrayList<>();
 		//populating the series with data
-		series.getData().addAll(DataPoints);
+        for (Integer id: DataPointsMap.keySet()) {
+            ArrayList<XYChart.Data> DataPoints = DataPointsMap.get(id);
+            XYChart.Series series = new XYChart.Series();
+            series.setName("Person: " + id);
+            series.getData().addAll(DataPoints);
+            seriesArrayList.add(series);
+            lineChart.getData().add(series);
+
+        }
 
 //        series.getData().add(new XYChart.Data(1, 23));
 //        series.getData().add(new XYChart.Data(2, 14));
@@ -49,8 +58,8 @@ public class Chart extends Application {
 //        series.getData().add(new XYChart.Data(11, 29));
 //        series.getData().add(new XYChart.Data(12, 25));
 
-		Scene scene  = new Scene(lineChart,800,600);
-		lineChart.getData().add(series);
+        Scene scene  = new Scene(lineChart,800,600);
+
 
 		stage.setScene(scene);
 		stage.show();

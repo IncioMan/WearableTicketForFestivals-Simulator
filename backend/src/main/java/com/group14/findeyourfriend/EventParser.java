@@ -44,8 +44,10 @@ public class EventParser {
 		BufferedReader in = new BufferedReader(new InputStreamReader(stream));
 
 		while ((thisLine = in.readLine()) != null) {
-			Event e = interpretLine(thisLine);
-			simulationEvents.add(e);
+			if (!thisLine.startsWith("#")) {
+				Event e = interpretLine(thisLine);
+				simulationEvents.add(e);
+			}
 		}
 
 		DebugLog.log("List of events correctly parsed.");
