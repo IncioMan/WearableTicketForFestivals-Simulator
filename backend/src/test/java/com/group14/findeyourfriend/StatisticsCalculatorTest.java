@@ -12,7 +12,7 @@ public class StatisticsCalculatorTest {
 	public void testAvarageAgeInDatabase() {
 		List<Person> people = new ArrayList<>();
 		Person person = new Person();
-		Bracelet bracelet = new Bracelet(null, null, person);
+		Bracelet bracelet = new Bracelet(null, null, null, person);
 		person.setBracelet(bracelet);
 		DatabaseEntry databaseEnty = new DatabaseEntry();
 		databaseEnty.setPosition(null);
@@ -26,7 +26,7 @@ public class StatisticsCalculatorTest {
 		people.add(person);
 
 		person = new Person();
-		bracelet = new Bracelet(null, null, person);
+		bracelet = new Bracelet(null, null, null, person);
 		person.setBracelet(bracelet);
 		databaseEnty = new DatabaseEntry();
 		databaseEnty.setPosition(null);
@@ -47,7 +47,7 @@ public class StatisticsCalculatorTest {
 		Assert.assertEquals(100, calculator.getTotalPercentagePeopleInDatabase(), 0);
 
 		person = new Person();
-		bracelet = new Bracelet(null, null, person);
+		bracelet = new Bracelet(null, null, null, person);
 		person.setBracelet(bracelet);
 		databaseEnty = new DatabaseEntry();
 		databaseEnty.setPosition(null);
