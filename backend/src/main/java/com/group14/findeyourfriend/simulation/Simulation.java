@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 import com.group14.findeyourfriend.*;
 import com.group14.findeyourfriend.bracelet.*;
+import com.group14.findeyourfriend.message.Broker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -87,7 +88,6 @@ public class Simulation {
 //				try {
 //					Thread.sleep(90);
 //				} catch (InterruptedException e1) {
-//					// TODO Auto-generated catch block
 //					e1.printStackTrace();
 //				}
 			}

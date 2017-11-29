@@ -1,8 +1,9 @@
-package com.group14.findeyourfriend.bracelet;
+package com.group14.findeyourfriend.message;
 
 import java.util.HashSet;
 
 import com.group14.common_interface.Position;
+import com.group14.findeyourfriend.bracelet.Bracelet;
 
 //========================================================================
 // This conversion was produced by the Free Edition of

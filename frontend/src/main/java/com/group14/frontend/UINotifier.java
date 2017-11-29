@@ -61,7 +61,7 @@ public class UINotifier {
 		try {
 			messageConsumer.setMessageListener(listener);
 		} catch (JMSException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 	}
@@ -90,7 +90,7 @@ public class UINotifier {
 
 			payloadConsumers.add(payloadConsumer);
 		} catch (JMSException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 	}
@@ -108,16 +108,16 @@ public class UINotifier {
 			});
 			Thread.sleep(100);
 		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		}
 	}

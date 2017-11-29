@@ -57,7 +57,7 @@ public class Notifier {
 	// try {
 	// createQueue(clientId, queueName);
 	// } catch (JMSException e) {
-	// // TODO Auto-generated catch block
+
 	// e.printStackTrace();
 	// }
 	// }
@@ -99,7 +99,7 @@ public class Notifier {
 	// try {
 	// messageProducer.send(session.createTextMessage(mapper.writeValueAsString(payload)));
 	// } catch (Exception e) {
-	// // TODO Auto-generated catch block
+
 	// e.printStackTrace();
 	// }
 	//

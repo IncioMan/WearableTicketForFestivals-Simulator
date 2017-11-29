@@ -61,7 +61,7 @@ public class JsonTest {
 		List<Event> events = new ArrayList<>();
 
 		public Events() {
-			// TODO Auto-generated constructor stub
+
 		}
 
 		public List<Event> getEvents() {

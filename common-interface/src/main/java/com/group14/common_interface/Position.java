@@ -14,7 +14,7 @@ public class Position implements Serializable {
 	}
 
 	public Position() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	public final void setCoordinates(Vector2 value) {

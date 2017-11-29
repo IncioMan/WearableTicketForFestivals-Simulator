@@ -60,7 +60,6 @@ public class SearchEvent extends Event {
 
 	@Override
 	public int getStart() {
-		// TODO Auto-generated method stub
 		return super.getStart();
 	}
 

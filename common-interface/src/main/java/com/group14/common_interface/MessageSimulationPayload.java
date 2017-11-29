@@ -11,7 +11,7 @@ public class MessageSimulationPayload implements Serializable {
 	private List<PersonDto> people;
 
 	public MessageSimulationPayload() {
-		// TODO Auto-generated constructor stub
+
 	}
 
 	public List<PersonDto> getPeople() {

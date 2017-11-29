@@ -7,7 +7,9 @@ package com.group14.findeyourfriend.statemachine;
 //========================================================================
 
 public enum ProcessState {
-	SleepState, CommState, LedState, SearchState, UpdateState;
+	SleepState, CommState, LedState, SLookupState, UpdateState,
+	// SR states below
+	InterpretState, RequestState, RLookupState, ListenState, ResponseState;
 
 	public static final int SIZE = java.lang.Integer.SIZE;
 
