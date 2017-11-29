@@ -38,10 +38,10 @@ public class Simulation {
 
 	@Autowired
 	private Notifier notifier;
-	private List<Consumer<Collection<Person>>> guestsCosumers;
+	private List<Consumer<Collection<Person>>> guestsConsumers;
 
 	public Simulation() {
-		guestsCosumers = new ArrayList<>();
+		guestsConsumers = new ArrayList<>();
 	}
 
 	public void init(Queue<Event> events, int simulationTime) {
@@ -88,7 +88,9 @@ public class Simulation {
 				// map.Print();
 				for (Person person : guests.values())
 					person.UpdatePosition();
-				notifier.notify(guests.values());
+				if (notifier != null) {
+					notifier.notify(guests.values());
+				}
 				// System.out.println("UI Notified");
 
 				// try {
@@ -99,7 +101,7 @@ public class Simulation {
 				// }
 			}
 			clock++;
-			guestsCosumers.forEach(c -> {
+			guestsConsumers.forEach(c -> {
 				c.accept(guests.values());
 			});
 		}
@@ -120,7 +122,7 @@ public class Simulation {
 			int randomY = ThreadLocalRandom.current().nextInt(-50, 5 + 10);
 			float x = (float) randomX / 10;
 			float y = (float) randomY / 10;
-			guest.setAcceleration(new Vector2(x, y));
+			guest.setAcceleration(Vector2.Normalize(new Vector2(x, y)));
 
 			guests.put(guest.getId(), guest);
 		}
@@ -135,7 +137,7 @@ public class Simulation {
 	}
 
 	public void add(Consumer<Collection<Person>> consumer) {
-		guestsCosumers.add(consumer);
+		guestsConsumers.add(consumer);
 	}
 
 }
