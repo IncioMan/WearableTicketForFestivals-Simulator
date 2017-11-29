@@ -20,6 +20,9 @@ public class Simulator {
 	@Autowired
 	private Simulation simulation;
 
+	@Autowired
+	private StatisticsCalculator calculator;
+
 	public static void main(String[] args) {
 		DebugLog.setEnabled(true);
 		DebugLog.setEnabledTimers(false);
@@ -34,6 +37,7 @@ public class Simulator {
 			InputStream stream = Simulator.class.getClassLoader().getResourceAsStream("events.txt");
 			Queue<Event> events = EventParser.parse(stream);
 			simulation.init(events, 864000000);// Simulate 10 days in ms
+			simulation.add(calculator::calculate);
 			simulation.run();
 			Chart.main(new String[0]);// Show chart
 		} catch (IOException e) {

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,9 +28,10 @@ public class Simulation {
 
 	@Autowired
 	private Notifier notifier;
+	private List<Consumer<Collection<Person>>> guestsCosumers;
 
 	public Simulation() {
-		// TODO Auto-generated constructor stub
+		guestsCosumers = new ArrayList<>();
 	}
 
 	public void init(Queue<Event> events, int simulationTime) {
@@ -85,13 +87,9 @@ public class Simulation {
 				}
 			}
 			clock++;
-
-			// try {
-			// Thread.sleep(1000);
-			// } catch (InterruptedException e) {
-			// e.printStackTrace();
-			// }
-
+			guestsCosumers.forEach(c -> {
+				c.accept(guests.values());
+			});
 		}
 		DebugLog.log("All events processed or simulation time has run out. Simulation finished.");
 	}
@@ -122,6 +120,10 @@ public class Simulation {
 
 	public Person getPersonById(int id) {
 		return guests.get(id);
+	}
+
+	public void add(Consumer<Collection<Person>> consumer) {
+		guestsCosumers.add(consumer);
 	}
 
 }

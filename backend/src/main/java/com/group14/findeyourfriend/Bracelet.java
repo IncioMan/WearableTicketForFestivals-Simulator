@@ -25,7 +25,7 @@ public class Bracelet {
 	private boolean _timerUpRun;
 	private int _timerUpDelay;
 	private Broker _broker;
-	private final HashMap<Integer, DatabaseEntry> _dataBase = new HashMap<Integer, DatabaseEntry>();
+	private final HashMap<Integer, DatabaseEntry> dataBase = new HashMap<Integer, DatabaseEntry>();
 
 	private final Object _stateLock = new Object();
 	private final Object _dbLock = new Object();
@@ -87,8 +87,8 @@ public class Bracelet {
 		case TimerF:
 			if (_lookForPerson != null && !IsFound()) {
 				synchronized (_dbLock) {
-					if (_dataBase.containsKey(_lookForPerson.getId())) {
-						DatabaseEntry dbEntry = _dataBase.get(_lookForPerson.getId());
+					if (dataBase.containsKey(_lookForPerson.getId())) {
+						DatabaseEntry dbEntry = dataBase.get(_lookForPerson.getId());
 						if (person.getPosition().DistanceTo(dbEntry.getPosition()) > _proximity) {
 							battery.DecrementEnergy(cpuCurrentRun_mA, updateLedTime);// Decrement battery from CPU time
 							person.GoTowards(dbEntry.getPosition());
@@ -113,7 +113,7 @@ public class Bracelet {
 		case TimerLed:
 			// Change the Leds??
 			synchronized (_dbLock) {
-				DatabaseEntry dbEntry = _dataBase.get(_lookForPerson.getId());
+				DatabaseEntry dbEntry = dataBase.get(_lookForPerson.getId());
 				person.GoTowards(dbEntry.getPosition());
 				setFound(false);
 				setGuiding(true);
@@ -162,7 +162,7 @@ public class Bracelet {
 			DebugLog.log(person.getId() + ": Looking up location in my DB");
 			if (_lookForPerson != null) {
 				battery.DecrementEnergy(cpuCurrentRun_mA, 1);
-				if (_dataBase.containsKey(_lookForPerson.getId())) {
+				if (dataBase.containsKey(_lookForPerson.getId())) {
 					setGuiding(true);
 					setFound(false);
 					_stateMachine.MoveNext(Command.FriendFound);
@@ -274,8 +274,8 @@ public class Bracelet {
 		{
 			DatabaseEntry databaseEnty = new DatabaseEntry();
 			databaseEnty.setPosition(position);
-			databaseEnty.setTimeStamp(java.time.LocalDateTime.now());
-			_dataBase.put(sender.person.getId(), databaseEnty); // add or overwrite
+			databaseEnty.setTimeStamp(System.currentTimeMillis());
+			dataBase.put(sender.person.getId(), databaseEnty); // add or overwrite
 			DebugLog.log(person.getId() + ": HEARD IT FROM " + sender.person.getId());
 		}
 	}
@@ -307,6 +307,10 @@ public class Bracelet {
 
 	public final Position GetPosition() {
 		return person.getPosition();
+	}
+
+	public HashMap<Integer, DatabaseEntry> getDataBase() {
+		return dataBase;
 	}
 
 	public final double GetRadioRange() {
