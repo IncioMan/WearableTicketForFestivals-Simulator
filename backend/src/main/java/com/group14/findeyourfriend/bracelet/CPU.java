@@ -1,4 +1,4 @@
-package com.group14.findeyourfriend;
+package com.group14.findeyourfriend.bracelet;
 
 public class CPU {
     public double cpuCurrentSleep_mA;

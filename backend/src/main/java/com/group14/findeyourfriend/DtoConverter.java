@@ -1,6 +1,7 @@
 package com.group14.findeyourfriend;
 
 import com.group14.common_interface.PersonDto;
+import com.group14.findeyourfriend.bracelet.Person;
 
 public class DtoConverter {
 

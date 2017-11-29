@@ -3,6 +3,10 @@ package com.group14.findeyourfriend;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.group14.findeyourfriend.bracelet.Bracelet;
+import com.group14.findeyourfriend.bracelet.DatabaseEntry;
+import com.group14.findeyourfriend.bracelet.Person;
+import com.group14.findeyourfriend.simulation.StatisticsCalculator;
 import org.junit.Assert;
 import org.junit.Test;
 
