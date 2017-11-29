@@ -7,14 +7,14 @@ package com.group14.findeyourfriend;
 // Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
 //========================================================================
 public class DatabaseEntry {
-	private java.time.LocalDateTime TimeStamp = java.time.LocalDateTime.MIN;
+	private Long timeStamp;
 
-	public final java.time.LocalDateTime getTimeStamp() {
-		return TimeStamp;
+	public Long getTimeStamp() {
+		return timeStamp;
 	}
 
-	public final void setTimeStamp(java.time.LocalDateTime value) {
-		TimeStamp = value;
+	public void setTimeStamp(Long timeStamp) {
+		this.timeStamp = timeStamp;
 	}
 
 	private com.group14.common_interface.Position Position;

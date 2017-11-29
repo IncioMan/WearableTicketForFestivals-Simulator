@@ -10,6 +10,8 @@ class Person{
     this.X = X;
     this.Y = Y;
     this.broadcasting = broadcasting;
+    this.rangeRadius = 300;
+    this.rangeCounter = 0;
     this.col = 'white';
   }
 
@@ -24,9 +26,14 @@ class Person{
       if(this.broadcasting){
         noFill();
         stroke('#40C4FF');
-        ellipse(this.X,this.Y,person_width*3,person_height*3);
-        ellipse(this.X,this.Y,person_width*6,person_width*6);
-        ellipse(this.X,this.Y,person_width*9,person_width*9);
+        this.rangeCounter += 2;
+        this.rangeCounter = this.rangeCounter % this.rangeRadius;
+        if(this.rangeCounter < person_width/2){
+          this.rangeCounter = person_width * 2;
+        }
+        ellipse(this.X,this.Y,this.rangeCounter/2,this.rangeCounter/2);
+        ellipse(this.X,this.Y,this.rangeCounter,this.rangeCounter);
+        ellipse(this.X,this.Y,this.rangeRadius,this.rangeRadius);
       }
     }
 
@@ -39,7 +46,10 @@ class Person{
 }
 
 function setup() {
-  createCanvas(1200, 600);
+  var canvas = createCanvas(1200, 600);
+  //guests.push(new Person(0,100,100, true));
+  // Move the canvas so it's inside our <div id="sketch-holder">.
+  canvas.parent('sketch-holder');
   noStroke();
 }
 
@@ -59,11 +69,11 @@ function mousePressed(){
 window.setInterval(function(){
   var url = 'http://localhost:8080/guests'
   loadJSON(url, drawGuests);
-}, 90);
+}, 3000);
 
 function drawGuests(people) {
   guests = [];
   people.forEach(function(p){
-      guests.push(new Person(p.id, p.position.coordinates.x, p.position.coordinates.y, random(1) > .5));
+      guests.push(new Person(p.id, p.position.coordinates.x, p.position.coordinates.y, random(1) > 0));
   });
 }

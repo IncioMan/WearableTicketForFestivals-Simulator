@@ -20,6 +20,9 @@ public class Simulator {
 	@Autowired
 	private Simulation simulation;
 
+	@Autowired
+	private StatisticsCalculator calculator;
+
 	public static void main(String[] args) {
 		DebugLog.setEnabled(true);
 		DebugLog.setEnabledTimers(false);
@@ -37,7 +40,7 @@ public class Simulator {
 			Queue<Parameters> params = ParameterParser.parse(paramStream);
 			simulation.init(events, 86400000);// Simulate 1 days in ms
 			simulation.run(params.poll());
-			Chart.main(new String[0]);// Show chart
+//			Chart.main(new String[0]);// Show chart
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

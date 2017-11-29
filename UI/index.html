@@ -1,8 +1,57 @@
 <html>
   <head>
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.js"></script>
     <script src="sketch.js"></script>
+    <script src="myjs.js"></script>
+    <style>
+      .box-value{
+        font-family: Arial, Helvetica, sans-serif;
+        display: inline-block;
+        width: 20%;
+        height: 180px;
+        margin: 32px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        padding: 0px 0px 0px 16px;
+      }
+      .canvas{
+        margin-left: 24px;
+      }
+      .title{
+        font-family: Arial, Helvetica, sans-serif;
+        margin:24px;
+      }
+      .value{
+        padding-left: 40%;
+        padding-top: 20px;
+      }
+    </style>
   </head>
   <body>
+    <h1 class="title">Find your friend</h1>
+    <div>
+      <div id="sketch-holder" class="canvas">
+        <!-- Our sketch will go here! -->
+      </div>
+      <div class="box-value">
+        <h3>Total percentage user in DB:</h3>
+        <h1 id="tapudb" class="value"></h1>
+      </div>
+      <div class="total-title box-value">
+        <h3>Current percentage user in DB:</h3>
+        <h1 id="capudb" class="value"></h1>
+      </div>
+      <div class="total-title box-value">
+        <h3>Total average age in DB:</h3>
+        <h1 id="taadb" class="value"></h1>
+      </div>
+      <div class="total-title box-value">
+        <h3>Current average age in DB:</h3>
+        <h1 id="caadb" class="value"></h1>
+      </div>
+    </div>
   </body>
 </html>
