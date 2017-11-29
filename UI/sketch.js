@@ -69,7 +69,7 @@ function mousePressed(){
 window.setInterval(function(){
   var url = 'http://localhost:8080/guests'
   loadJSON(url, drawGuests);
-}, 3000);
+}, 100);
 
 function drawGuests(people) {
   guests = [];

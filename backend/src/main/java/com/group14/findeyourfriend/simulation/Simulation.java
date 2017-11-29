@@ -8,13 +8,20 @@ import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
-import com.group14.findeyourfriend.*;
-import com.group14.findeyourfriend.bracelet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.group14.common_interface.Position;
 import com.group14.common_interface.Vector2;
+import com.group14.findeyourfriend.Constants;
+import com.group14.findeyourfriend.Notifier;
+import com.group14.findeyourfriend.Parameters;
+import com.group14.findeyourfriend.bracelet.Battery;
+import com.group14.findeyourfriend.bracelet.Bracelet;
+import com.group14.findeyourfriend.bracelet.Broker;
+import com.group14.findeyourfriend.bracelet.CPU;
+import com.group14.findeyourfriend.bracelet.Person;
+import com.group14.findeyourfriend.bracelet.Radio;
 import com.group14.findeyourfriend.debug.DebugLog;
 
 @Component
@@ -64,7 +71,7 @@ public class Simulation {
 		this.cpu = parameters.cpu;
 		// TODO implement parameter passing with Simulator
 		battery = new Battery(225); // Coincell battery
-//		radio = new Radio(1000, 0.01, 7.0, 5);
+		// radio = new Radio(1000, 0.01, 7.0, 5);
 
 		while (clock <= simulationTime) {
 			ArrayList<Event> events = timeEvents.getOrDefault(clock, new ArrayList<>());
@@ -81,15 +88,15 @@ public class Simulation {
 				// map.Print();
 				for (Person person : guests.values())
 					person.UpdatePosition();
-//				notifier.notify(guests.values());
-//				System.out.println("UI Notified");
+				notifier.notify(guests.values());
+				// System.out.println("UI Notified");
 
-//				try {
-//					Thread.sleep(90);
-//				} catch (InterruptedException e1) {
-//					// TODO Auto-generated catch block
-//					e1.printStackTrace();
-//				}
+				// try {
+				// Thread.sleep(90);
+				// } catch (InterruptedException e1) {
+				// // TODO Auto-generated catch block
+				// e1.printStackTrace();
+				// }
 			}
 			clock++;
 			guestsCosumers.forEach(c -> {
@@ -101,7 +108,7 @@ public class Simulation {
 
 	public void newGuestsArrived(List<Person> newGuests) {
 		for (Person guest : newGuests) {
-			Bracelet bracelet = new Bracelet(new Battery(battery.getCapacity_mAh()), radio, cpu,  guest);
+			Bracelet bracelet = new Bracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest);
 			bracelet.Subscribe(broker);
 			guest.setBracelet(bracelet);
 

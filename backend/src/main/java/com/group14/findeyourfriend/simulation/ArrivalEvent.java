@@ -1,15 +1,15 @@
 package com.group14.findeyourfriend.simulation;
 
-import com.group14.findeyourfriend.bracelet.Person;
-
 import java.util.List;
+
+import com.group14.findeyourfriend.bracelet.Person;
 
 public class ArrivalEvent extends Event {
 
 	private List<Person> peopleComing;
 
 	@Override
-	void process() {
+	public void process() {
 		sim.newGuestsArrived(peopleComing);
 	}
 

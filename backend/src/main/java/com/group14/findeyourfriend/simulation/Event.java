@@ -4,7 +4,7 @@ public abstract class Event {
 	protected int start;
 	protected Simulation sim;
 
-	abstract void process();
+	public abstract void process();
 
 	public void setSimulation(Simulation simulation) {
 		this.sim = simulation;
