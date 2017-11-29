@@ -12,7 +12,7 @@ public class SearchEvent extends Event {
 	private int preyId;
 
 	@Override
-	void process() {
+	public void process() {
 		for (Person h : sim.getGuests()) {
 			if (h.getName().equals(hunterName)) {
 				for (Person p : sim.getGuests()) {

@@ -16,6 +16,15 @@ import org.springframework.stereotype.Component;
 
 import com.group14.common_interface.Position;
 import com.group14.common_interface.Vector2;
+import com.group14.findeyourfriend.Constants;
+import com.group14.findeyourfriend.Notifier;
+import com.group14.findeyourfriend.Parameters;
+import com.group14.findeyourfriend.bracelet.Battery;
+import com.group14.findeyourfriend.bracelet.Bracelet;
+import com.group14.findeyourfriend.bracelet.Broker;
+import com.group14.findeyourfriend.bracelet.CPU;
+import com.group14.findeyourfriend.bracelet.Person;
+import com.group14.findeyourfriend.bracelet.Radio;
 import com.group14.findeyourfriend.debug.DebugLog;
 
 @Component
@@ -32,10 +41,10 @@ public class Simulation {
 
 	@Autowired
 	private Notifier notifier;
-	private List<Consumer<Collection<Person>>> guestsCosumers;
+	private List<Consumer<Collection<Person>>> guestsConsumers;
 
 	public Simulation() {
-		guestsCosumers = new ArrayList<>();
+		guestsConsumers = new ArrayList<>();
 	}
 
 	public void init(Queue<Event> events, int simulationTime) {
@@ -65,7 +74,7 @@ public class Simulation {
 		this.cpu = parameters.cpu;
 		// TODO implement parameter passing with Simulator
 		battery = new Battery(225); // Coincell battery
-//		radio = new Radio(1000, 0.01, 7.0, 5);
+		// radio = new Radio(1000, 0.01, 7.0, 5);
 
 		while (clock <= simulationTime) {
 			ArrayList<Event> events = timeEvents.getOrDefault(clock, new ArrayList<>());
@@ -82,8 +91,10 @@ public class Simulation {
 				// map.Print();
 				for (Person person : guests.values())
 					person.UpdatePosition();
-//				notifier.notify(guests.values());
-//				System.out.println("UI Notified");
+				if (notifier != null) {
+					notifier.notify(guests.values());
+				}
+				// System.out.println("UI Notified");
 
 //				try {
 //					Thread.sleep(90);
@@ -92,7 +103,7 @@ public class Simulation {
 //				}
 			}
 			clock++;
-			guestsCosumers.forEach(c -> {
+			guestsConsumers.forEach(c -> {
 				c.accept(guests.values());
 			});
 		}
@@ -101,7 +112,7 @@ public class Simulation {
 
 	public void newGuestsArrived(List<Person> newGuests) {
 		for (Person guest : newGuests) {
-			Bracelet bracelet = new Bracelet(new Battery(battery.getCapacity_mAh()), radio, cpu,  guest);
+			Bracelet bracelet = new Bracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest);
 			bracelet.Subscribe(broker);
 			guest.setBracelet(bracelet);
 
@@ -113,7 +124,7 @@ public class Simulation {
 			int randomY = ThreadLocalRandom.current().nextInt(-50, 5 + 10);
 			float x = (float) randomX / 10;
 			float y = (float) randomY / 10;
-			guest.setAcceleration(new Vector2(x, y));
+			guest.setAcceleration(Vector2.Normalize(new Vector2(x, y)));
 
 			guests.put(guest.getId(), guest);
 		}
@@ -128,7 +139,7 @@ public class Simulation {
 	}
 
 	public void add(Consumer<Collection<Person>> consumer) {
-		guestsCosumers.add(consumer);
+		guestsConsumers.add(consumer);
 	}
 
 }

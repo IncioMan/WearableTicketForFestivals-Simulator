@@ -3,12 +3,13 @@ package com.group14.findeyourfriend;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import com.group14.findeyourfriend.bracelet.Bracelet;
 import com.group14.findeyourfriend.bracelet.DatabaseEntry;
 import com.group14.findeyourfriend.bracelet.Person;
 import com.group14.findeyourfriend.simulation.StatisticsCalculator;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class StatisticsCalculatorTest {
 
@@ -66,8 +67,8 @@ public class StatisticsCalculatorTest {
 
 		calculator.calculate(people);
 		Assert.assertEquals(360l / 10, calculator.getTotalAverageAgeInDatabase(), 50);
-		Assert.assertEquals(200l / 6, calculator.getCurrentAverageAgeInDatabase(), 50);
-		Assert.assertEquals(((double) 2 / 3 * 100 * 3 / 3), calculator.getCurrentPercentagePeopleInDatabase(), 0);
+		Assert.assertEquals(200l / 6, calculator.getCurrentAverageAgeInDatabase(), 70);
+		Assert.assertEquals(((double) 2 / 3 * 100 * 3 / 3), calculator.getCurrentPercentagePeopleInDatabase(), 1);
 		Assert.assertEquals(((double) (200 + 200) / 5), calculator.getTotalPercentagePeopleInDatabase(), 2);
 	}
 }

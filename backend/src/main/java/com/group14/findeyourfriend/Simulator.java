@@ -1,11 +1,9 @@
-package com.group14.findeyourfriend.simulation;
+package com.group14.findeyourfriend;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Queue;
 
-import com.group14.findeyourfriend.ParameterParser;
-import com.group14.findeyourfriend.Parameters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +11,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.group14.findeyourfriend.debug.DebugLog;
+import com.group14.findeyourfriend.simulation.Event;
+import com.group14.findeyourfriend.simulation.EventParser;
+import com.group14.findeyourfriend.simulation.Simulation;
+import com.group14.findeyourfriend.simulation.StatisticsCalculator;
 
 @SpringBootApplication
 @EnableScheduling
@@ -39,9 +41,10 @@ public class Simulator {
 			InputStream paramStream = Simulator.class.getClassLoader().getResourceAsStream("params.txt");
 			Queue<Event> events = EventParser.parse(eventStream);
 			Queue<Parameters> params = ParameterParser.parse(paramStream);
+			simulation.add(calculator::calculate);
 			simulation.init(events, 86400000);// Simulate 1 days in ms
 			simulation.run(params.poll());
-//			Chart.main(new String[0]);// Show chart
+			// Chart.main(new String[0]);// Show chart
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
