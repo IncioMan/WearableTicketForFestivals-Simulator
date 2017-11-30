@@ -9,7 +9,14 @@ public class PersonDto implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Position position;
 	private Boolean broadcasting;
+	private Boolean communicating;
 	private String id;
+	private Number range;
+
+	public PersonDto() {
+		communicating = false;
+		broadcasting = false;
+	}
 
 	public Position getPosition() {
 		return position;
@@ -31,7 +38,23 @@ public class PersonDto implements Serializable {
 		this.id = id;
 	}
 
+	public Boolean getCommunicating() {
+		return communicating;
+	}
+
+	public void setCommunicating(Boolean communicating) {
+		this.communicating = communicating;
+	}
+
 	public String getId() {
 		return id;
+	}
+
+	public Number getRange() {
+		return range;
+	}
+
+	public void setRange(Number range) {
+		this.range = range;
 	}
 }

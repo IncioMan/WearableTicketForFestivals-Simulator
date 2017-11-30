@@ -62,20 +62,20 @@ public class StateMachineProcess {
 	 * Constructor where we set up the statetransitions based on currentstate, command -> next state
 	 */
 	public StateMachineProcess() {
-		setCurrentState(ProcessState.SleepState);
+		setCurrentState(ProcessState.SLEEP_STATE);
 		_transitions = new HashMap<StateTransition, ProcessState>();
-		_transitions.put(new StateTransition(ProcessState.SleepState, Command.TimerCp), ProcessState.CommState);
-		_transitions.put(new StateTransition(ProcessState.SleepState, Command.TimerLed), ProcessState.LedState);
-		_transitions.put(new StateTransition(ProcessState.SleepState, Command.StartSearch), ProcessState.SearchState);
-		_transitions.put(new StateTransition(ProcessState.CommState, Command.StartSearch), ProcessState.SearchState);
-		_transitions.put(new StateTransition(ProcessState.LedState, Command.StartSearch), ProcessState.SearchState);
-		_transitions.put(new StateTransition(ProcessState.UpdateState, Command.StartSearch), ProcessState.SearchState);
-		_transitions.put(new StateTransition(ProcessState.SleepState, Command.TimerF), ProcessState.LedState);
-		_transitions.put(new StateTransition(ProcessState.LedState, Command.Next), ProcessState.SleepState);
-		_transitions.put(new StateTransition(ProcessState.SearchState, Command.FriendNotFound), ProcessState.SleepState);
-		_transitions.put(new StateTransition(ProcessState.SearchState, Command.FriendFound), ProcessState.LedState);
-		_transitions.put(new StateTransition(ProcessState.CommState, Command.TimerUp), ProcessState.UpdateState);
-		_transitions.put(new StateTransition(ProcessState.UpdateState, Command.Next), ProcessState.SleepState);
+		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.TimerCp), ProcessState.COMMUNICATION_STATE);
+		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.TimerLed), ProcessState.LED_STATE);
+		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.StartSearch), ProcessState.SEARCH_STATE);
+		_transitions.put(new StateTransition(ProcessState.COMMUNICATION_STATE, Command.StartSearch), ProcessState.SEARCH_STATE);
+		_transitions.put(new StateTransition(ProcessState.LED_STATE, Command.StartSearch), ProcessState.SEARCH_STATE);
+		_transitions.put(new StateTransition(ProcessState.UPDATE_STATE, Command.StartSearch), ProcessState.SEARCH_STATE);
+		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.TimerF), ProcessState.LED_STATE);
+		_transitions.put(new StateTransition(ProcessState.LED_STATE, Command.Next), ProcessState.SLEEP_STATE);
+		_transitions.put(new StateTransition(ProcessState.SEARCH_STATE, Command.FriendNotFound), ProcessState.SLEEP_STATE);
+		_transitions.put(new StateTransition(ProcessState.SEARCH_STATE, Command.FriendFound), ProcessState.LED_STATE);
+		_transitions.put(new StateTransition(ProcessState.COMMUNICATION_STATE, Command.TimerUp), ProcessState.UPDATE_STATE);
+		_transitions.put(new StateTransition(ProcessState.UPDATE_STATE, Command.Next), ProcessState.SLEEP_STATE);
 	}
 
 	public final ProcessState GetNext(Command command) {
