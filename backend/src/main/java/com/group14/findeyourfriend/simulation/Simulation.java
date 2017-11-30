@@ -91,14 +91,6 @@ public class Simulation {
 				if (notifier != null) {
 					notifier.notify(guests.values());
 				}
-				// System.out.println("UI Notified");
-
-				// try {
-				// Thread.sleep(90);
-				// } catch (InterruptedException e1) {
-				// // TODO Auto-generated catch block
-				// e1.printStackTrace();
-				// }
 			}
 			clock++;
 			guestsConsumers.forEach(c -> {
@@ -122,7 +114,7 @@ public class Simulation {
 			int randomY = ThreadLocalRandom.current().nextInt(-50, 5 + 10);
 			float x = (float) randomX / 10;
 			float y = (float) randomY / 10;
-			guest.setAcceleration(Vector2.Normalize(new Vector2(x, y)));
+			guest.setSpeed(Vector2.Multiply(2f, Vector2.Normalize(new Vector2(x, y))));
 
 			guests.put(guest.getId(), guest);
 		}

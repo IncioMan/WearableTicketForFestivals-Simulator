@@ -46,7 +46,7 @@ class Person{
 }
 
 function setup() {
-  var canvas = createCanvas(1200, 600);
+  var canvas = createCanvas(1200, 800);
   //guests.push(new Person(0,100,100, true));
   // Move the canvas so it's inside our <div id="sketch-holder">.
   canvas.parent('sketch-holder');
@@ -69,7 +69,7 @@ function mousePressed(){
 window.setInterval(function(){
   var url = 'http://localhost:8080/guests'
   loadJSON(url, drawGuests);
-}, 100);
+}, 300);
 
 function drawGuests(people) {
   guests = [];

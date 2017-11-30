@@ -34,7 +34,7 @@ public class StatisticsCalculator {
 	private Double percentagePeopleOutOfRange;
 	// test pursoses, leave default in prod
 	Supplier<Long> getCurrentTime;
-	private Integer timeThreshold = 15;
+	private Integer timeThreshold = 15000;
 	private double outOfRangeCoefficient = 0.5; // % of how many people in the system you need to reach (even
 												// indirectly = thorugh others) in order to be considered in the
 												// range
@@ -47,22 +47,25 @@ public class StatisticsCalculator {
 	}
 
 	public void calculate(Collection<Person> guests) {
-		currentAverageAgeInDatabase = calculateAvgAgeLocationsDB(guests, getCurrentTime.get());
-		totalAverageAgeInDatabase = Pair.of(totalAverageAgeInDatabase.getLeft() + currentAverageAgeInDatabase.getLeft()//
-				, totalAverageAgeInDatabase.getRight() + currentAverageAgeInDatabase.getRight());
-		//
-		currentPercentagePeopleInDatabase = calculatePercentagePeopleInDatabase(guests);
-		totalPercentagePeopleInDatabase = Pair
-				.of(totalPercentagePeopleInDatabase.getLeft() + currentPercentagePeopleInDatabase.getLeft()//
-						, totalPercentagePeopleInDatabase.getRight() + currentPercentagePeopleInDatabase.getRight());
-		//
-		currentPercentageRecentLocationsInDatabase = calculatePercentageRecentLocationsInDatabase(guests,
-				getCurrentTime.get(), getTimeThreshold());
-		totalPercentageRecentLocationsInDatabase = Pair.of(totalPercentageRecentLocationsInDatabase.getLeft()
-				+ currentPercentageRecentLocationsInDatabase.getLeft()//
-				, totalPercentageRecentLocationsInDatabase.getRight()
-						+ currentPercentageRecentLocationsInDatabase.getRight());
-		percentagePeopleOutOfRange = calculatePercentagePeopleOutOfRange(guests);
+		new Thread(() -> {
+			currentAverageAgeInDatabase = calculateAvgAgeLocationsDB(guests, getCurrentTime.get());
+			totalAverageAgeInDatabase = Pair
+					.of(totalAverageAgeInDatabase.getLeft() + currentAverageAgeInDatabase.getLeft()//
+			, totalAverageAgeInDatabase.getRight() + currentAverageAgeInDatabase.getRight());
+			//
+			currentPercentagePeopleInDatabase = calculatePercentagePeopleInDatabase(guests);
+			totalPercentagePeopleInDatabase = Pair
+					.of(totalPercentagePeopleInDatabase.getLeft() + currentPercentagePeopleInDatabase.getLeft()//
+			, totalPercentagePeopleInDatabase.getRight() + currentPercentagePeopleInDatabase.getRight());
+			//
+			currentPercentageRecentLocationsInDatabase = calculatePercentageRecentLocationsInDatabase(guests,
+					getCurrentTime.get(), getTimeThreshold());
+			totalPercentageRecentLocationsInDatabase = Pair.of(totalPercentageRecentLocationsInDatabase.getLeft()
+					+ currentPercentageRecentLocationsInDatabase.getLeft()//
+			, totalPercentageRecentLocationsInDatabase.getRight()
+					+ currentPercentageRecentLocationsInDatabase.getRight());
+			percentagePeopleOutOfRange = calculatePercentagePeopleOutOfRange(guests);
+		}).start();
 		// System.out.println("Current average age in DB: " +
 		// getCurrentAverageAgeInDatabase() / 1000 + " s");
 		// System.out.println("Total average age in DB: " +
@@ -149,6 +152,7 @@ public class StatisticsCalculator {
 			return 0d;
 		}
 		return new BigDecimal(totalAverageAgeInDatabase.getLeft() / totalAverageAgeInDatabase.getRight())
+				.divide(new BigDecimal(1000))// return seconds
 				.setScale(2, RoundingMode.HALF_UP).doubleValue();
 	}
 
@@ -159,6 +163,7 @@ public class StatisticsCalculator {
 			return 0d;
 		}
 		return new BigDecimal(currentAverageAgeInDatabase.getLeft() / currentAverageAgeInDatabase.getRight())
+				.divide(new BigDecimal(1000))// return seconds
 				.setScale(2, RoundingMode.HALF_UP).doubleValue();
 	}
 

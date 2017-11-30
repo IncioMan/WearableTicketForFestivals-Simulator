@@ -99,8 +99,8 @@ public class Bracelet {
 							setGuiding(false);
 							DebugLog.log(person.getId() + " has Found " + _lookForPerson.getId());
 							_timerFRun = false;
-							person.setAcceleration(Vector2.Zero); // Stop when found!
-							_lookForPerson.setAcceleration(Vector2.Zero); // Other person stop
+							person.setSpeed(Vector2.Zero); // Stop when found!
+							_lookForPerson.setSpeed(Vector2.Zero); // Other person stop
 							// Turn off LEDs
 							_timerLedRun = false;
 						}
