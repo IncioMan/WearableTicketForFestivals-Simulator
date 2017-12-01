@@ -241,7 +241,7 @@ public class StatisticsCalculator {
 		guests.forEach(g -> {
 			guests.forEach(g2 -> {
 				if (!g.equals(g2)) {
-					if (Utils.isInReachable(g.getPosition(), g2.getPosition(), g.getBracelet().getRadioRange())) {
+					if (Utils.isReachable(g.getPosition(), g2.getPosition(), g.getBracelet().getRadioRange())) {
 						nodeMap.get(g).addNode(nodeMap.get(g2));
 					}
 				}

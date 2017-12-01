@@ -2,6 +2,7 @@ package com.group14.findeyourfriend.bracelet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import com.group14.common_interface.Position;
 import com.group14.common_interface.Vector2;
@@ -29,6 +30,7 @@ public class Bracelet {
 	private boolean _timerUpRun;
 	private Broker _broker;
 	private final HashMap<Integer, DatabaseEntry> dataBase = new HashMap<>();
+	private HashMap<Integer, HashSet<Long>> receivedMessages = new HashMap<>();
 
 	private final Object _stateLock = new Object();
 	private final Object _dbLock = new Object();
@@ -137,8 +139,7 @@ public class Bracelet {
 	private void CommState() {
 		_timerRRun = true;
 		_timerUpRun = true;
-		_broker.DoBroadcast(this);
-
+		broadcast();
 		battery.DecrementEnergy(cpu.cpuCurrentBroadcastAvg_mA, cpu.timerUpDelay);// Decrement battery from CPU for the
 																					// entire broadcast
 		// radio.setState(RadioState.Transmitting);
@@ -227,7 +228,7 @@ public class Bracelet {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.COMMUNICATION_STATE) {
 				DebugLog.logTimer(person.getId() + ": Rebroadcast");
-				_broker.DoBroadcast(this);
+				broadcast();
 				// radio.setState(RadioState.Transmitting);
 				// battery.DecrementEnergy(radio.getConsumption(), broadcastTime);
 				// radio.setState(RadioState.Passive);
@@ -261,23 +262,24 @@ public class Bracelet {
 	/**
 	 * Method to handle incomming broadcast
 	 * 
-	 * @param sender
-	 * @param position
+	 * @param senderId
+	 * @param messageId
 	 */
-	public final void HandleBroadcast(Bracelet sender, Position position) {
-		// Maybe add check to see if we are in CommState? I guess we don't want to
-		// handle broadcast else?
-		if (sender.person.getId() == this.person.getId()) {
+	public final void HandleBroadcast(int senderId, long messageId, HashMap<Integer, DatabaseEntry> senderDataBase) {
+		if (senderId == this.person.getId()) {
 			return;
 		}
+		HashSet<Long> senderMessageIds = receivedMessages.getOrDefault(senderId, new HashSet<>());
+		if(senderMessageIds.contains(messageId)) return; // Only handle received message once
+        receivedMessages.put(senderId, senderMessageIds);// Add to received messages
 		synchronized (_dbLock) // Thread safety locking
 		{
-			DatabaseEntry databaseEnty = new DatabaseEntry();
-			databaseEnty.setPosition(position);
-
-			databaseEnty.setTimeStamp(System.currentTimeMillis());
-			dataBase.put(sender.person.getId(), databaseEnty); // add or overwrite
-			DebugLog.logTimer(person.getId() + ": HEARD IT FROM " + sender.person.getId());
+		    for (int dbKey: senderDataBase.keySet()) {
+                if(dbKey == person.getId()) continue; //Dont update my own position
+                DatabaseEntry entry = senderDataBase.get(dbKey);
+                if(entry.getTimeStamp() > dataBase.getOrDefault(dbKey, new DatabaseEntry()).getTimeStamp()) dataBase.put(dbKey, entry); // update or overwrite
+            }
+			DebugLog.logTimer(person.getId() + ": HEARD IT FROM " + senderId);
 		}
 	}
 
@@ -321,6 +323,18 @@ public class Bracelet {
 	public StateMachineProcess getStateMachine() {
 		return stateMachine;
 	}
+	private void broadcast(){
+	    int myId = person.getId();
+        HashSet<Long> myMessages = receivedMessages.getOrDefault(myId, new HashSet<>());
+        long messageId = System.currentTimeMillis();
+        myMessages.add(messageId);
+        receivedMessages.put(myId, myMessages);
+        DatabaseEntry dbE = new DatabaseEntry();
+        dbE.setPosition(getPosition());
+        dbE.setTimeStamp(System.currentTimeMillis());
+        dataBase.put(person.getId(), dbE);
+		_broker.DoBroadcast(person.getId(), getPosition(), radio.getRange_M(), messageId, getDataBase());
+	}
 
 	public void transition(int clock) {
 
@@ -333,7 +347,7 @@ public class Bracelet {
 			OnTimerF();
 		}
 		if (clock % cpu.timerRDelay == 0 && _timerRRun) {
-			// Rebroadcast
+			//
 			OnTimerR();
 		}
 		if (clock % cpu.timerUpDelay == 0 && _timerUpRun) {

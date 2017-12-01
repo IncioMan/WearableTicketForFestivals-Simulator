@@ -4,7 +4,7 @@ import com.group14.common_interface.Position;
 
 public class Utils {
 
-	public static boolean isInReachable(Position startPosition, Position targetPosition, Double radius) {
+	public static boolean isReachable(Position startPosition, Position targetPosition, Double radius) {
 		return startPosition.DistanceTo(targetPosition) <= radius;
 	}
 
