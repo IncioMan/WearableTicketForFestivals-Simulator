@@ -8,9 +8,6 @@ import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
-import com.group14.findeyourfriend.*;
-import com.group14.findeyourfriend.bracelet.*;
-import com.group14.findeyourfriend.message.Broker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -84,28 +81,20 @@ public class Simulation {
 			for (Person person : guests.values())
 				person.getBracelet().transition(clock);
 
-			// System.out.println(map.AllInBound());
-
-			if (clock % 1000 == 0) {
-				// Map.clrscr();
-				// map.Print();
+			if (clock % 500 == 0) {
 				for (Person person : guests.values())
 					person.UpdatePosition();
 				if (notifier != null) {
 					notifier.notify(guests.values());
 				}
-				// System.out.println("UI Notified");
+			}
+			if(clock % 3 == 0){
+				guestsConsumers.forEach(c -> {
+					c.accept(guests.values());
+				});
 
-//				try {
-//					Thread.sleep(90);
-//				} catch (InterruptedException e1) {
-//					e1.printStackTrace();
-//				}
 			}
 			clock++;
-			guestsConsumers.forEach(c -> {
-				c.accept(guests.values());
-			});
 		}
 		DebugLog.log("All events processed or simulation time has run out. Simulation finished.");
 	}
@@ -124,7 +113,7 @@ public class Simulation {
 			int randomY = ThreadLocalRandom.current().nextInt(-50, 5 + 10);
 			float x = (float) randomX / 10;
 			float y = (float) randomY / 10;
-			guest.setAcceleration(Vector2.Normalize(new Vector2(x, y)));
+			guest.setSpeed(Vector2.Normalize(new Vector2(x, y)));
 
 			guests.put(guest.getId(), guest);
 		}

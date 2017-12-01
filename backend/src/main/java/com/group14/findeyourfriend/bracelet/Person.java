@@ -1,5 +1,7 @@
 package com.group14.findeyourfriend.bracelet;
 
+import java.util.Objects;
+
 public class Person extends Mover {
 	private String name;
 	private Bracelet bracelet;
@@ -12,6 +14,10 @@ public class Person extends Mover {
 
 	public Person() {
 		super();
+	}
+
+	public Person(int id) {
+		this.id = id;
 	}
 
 	public final int getId() {
@@ -37,5 +43,19 @@ public class Person extends Mover {
 
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Person) {
+			return this.getId() == ((Person) obj).getId();
+		}
+
+		return false;
 	}
 }

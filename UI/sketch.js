@@ -5,12 +5,12 @@ var guests = [];
 
 class Person{
 
-  constructor(id, X, Y, broadcasting){
+  constructor(id, X, Y, range, communicating){
     this.id = id;
     this.X = X;
     this.Y = Y;
-    this.broadcasting = broadcasting;
-    this.rangeRadius = 300;
+    this.communicating = communicating;
+    this.rangeRadius = range;
     this.rangeCounter = 0;
     this.col = 'white';
   }
@@ -23,7 +23,7 @@ class Person{
       fill('black');
       textSize(20);
       text(this.id, this.X - person_width/4, this.Y - person_height/4, person_width, person_height);
-      if(this.broadcasting){
+      if(true){
         noFill();
         stroke('#40C4FF');
         this.rangeCounter += 2;
@@ -46,7 +46,7 @@ class Person{
 }
 
 function setup() {
-  var canvas = createCanvas(1200, 600);
+  var canvas = createCanvas(1200, 800);
   //guests.push(new Person(0,100,100, true));
   // Move the canvas so it's inside our <div id="sketch-holder">.
   canvas.parent('sketch-holder');
@@ -74,6 +74,6 @@ window.setInterval(function(){
 function drawGuests(people) {
   guests = [];
   people.forEach(function(p){
-      guests.push(new Person(p.id, p.position.coordinates.x, p.position.coordinates.y, random(1) > 0));
+      guests.push(new Person(p.id, p.position.coordinates.x, p.position.coordinates.y, p.range, p.communicating));
   });
 }

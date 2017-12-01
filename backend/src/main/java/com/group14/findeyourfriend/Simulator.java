@@ -27,7 +27,7 @@ public class Simulator {
 	private StatisticsCalculator calculator;
 
 	public static void main(String[] args) {
-		DebugLog.setEnabled(true);
+		DebugLog.setEnabled(false);
 		DebugLog.setEnabledTimers(false);
 		SpringApplication.run(Simulator.class, args);
 		// Simulator simulator = ctx.getBean(Simulator.class);

@@ -1,9 +1,11 @@
-package com.group14.findeyourfriend.message;
+package com.group14.findeyourfriend.bracelet;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 import com.group14.common_interface.Position;
-import com.group14.findeyourfriend.bracelet.Bracelet;
+import com.group14.findeyourfriend.statemachine.ProcessState;
+import com.group14.findeyourfriend.utils.Utils;
 
 //========================================================================
 // This conversion was produced by the Free Edition of
@@ -12,14 +14,12 @@ import com.group14.findeyourfriend.bracelet.Bracelet;
 //========================================================================
 
 public class Broker {
-	private final HashSet<Bracelet> _bracelets = new HashSet<Bracelet>();
+	private final HashSet<Bracelet> _bracelets = new HashSet<>();
 
-	public final void DoBroadcast(Bracelet b) {
-		Position broadcastPosition = b.GetPosition();
-		double range = b.GetRadioRange();
+	public final void DoBroadcast(int senderId, Position broadcastPosition, double range, long messageId, HashMap<Integer, DatabaseEntry> database) {
 		for (Bracelet bracelet : _bracelets) {
-			if (broadcastPosition.DistanceTo(bracelet.GetPosition()) <= range) {
-				bracelet.HandleBroadcast(b, broadcastPosition);
+			if (Utils.isReachable(broadcastPosition, bracelet.getPosition(), range) && bracelet.getStateMachine().getCurrentState() == ProcessState.COMMUNICATION_STATE) {
+				bracelet.HandleBroadcast(senderId, messageId, database);
 			}
 		}
 

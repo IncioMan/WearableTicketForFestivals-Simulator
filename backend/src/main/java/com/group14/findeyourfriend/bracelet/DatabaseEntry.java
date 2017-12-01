@@ -1,12 +1,16 @@
 package com.group14.findeyourfriend.bracelet;
-
+import com.group14.common_interface.Position;
 //========================================================================
 
-// This conversion was produced by the Free Edition of
-// C# to Java Converter courtesy of Tangible Software Solutions.
-// Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
+
+
 //========================================================================
 public class DatabaseEntry {
+	public DatabaseEntry(){
+		this.timeStamp = 0L;
+		this.Position = null;
+	}
+
 	private Long timeStamp;
 
 	public Long getTimeStamp() {
@@ -17,13 +21,13 @@ public class DatabaseEntry {
 		this.timeStamp = timeStamp;
 	}
 
-	private com.group14.common_interface.Position Position;
+	private Position Position;
 
-	public final com.group14.common_interface.Position getPosition() {
+	public final Position getPosition() {
 		return Position;
 	}
 
-	public final void setPosition(com.group14.common_interface.Position value) {
+	public final void setPosition(Position value) {
 		Position = value;
 	}
 }

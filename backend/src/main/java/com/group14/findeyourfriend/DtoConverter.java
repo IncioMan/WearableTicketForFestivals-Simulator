@@ -13,6 +13,17 @@ public class DtoConverter {
 		PersonDto dto = new PersonDto();
 		dto.setId(model.getName());
 		dto.setPosition(model.getPosition());
+		dto.setRange(model.getBracelet().getRadioRange());
+		switch (model.getBracelet().getStateMachine().getCurrentState()) {
+		case COMMUNICATION_STATE:
+			dto.setCommunicating(true);
+			break;
+		case SEARCH_STATE:
+			dto.setCommunicating(true);
+			break;
+		default:
+			break;
+		}
 		return dto;
 	}
 }
