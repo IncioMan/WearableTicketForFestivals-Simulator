@@ -114,7 +114,7 @@ public class Simulation {
 			int randomY = ThreadLocalRandom.current().nextInt(-50, 5 + 10);
 			float x = (float) randomX / 10;
 			float y = (float) randomY / 10;
-			guest.setSpeed(Vector2.Multiply(2f, Vector2.Normalize(new Vector2(x, y))));
+			guest.setSpeed(Vector2.Normalize(new Vector2(x, y)));
 
 			guests.put(guest.getId(), guest);
 		}

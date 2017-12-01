@@ -70,7 +70,7 @@ public class Mover {
 		DebugLog.log(getPosition() + " GoTowards " + otherPosition);
 		Vector2 heading = Vector2.Subtract(otherPosition.getCoordinates(), getPosition().getCoordinates());
 		Vector2 direction = Vector2.Normalize(heading);
-		setSpeed(Vector2.Multiply(2f, direction));
+		setSpeed(Vector2.Multiply(1.5f, direction));
 		DebugLog.log("Direction: " + direction);
 	}
 }
