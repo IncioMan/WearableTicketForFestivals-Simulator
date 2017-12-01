@@ -18,7 +18,7 @@ public class DtoConverter {
 		case COMMUNICATION_STATE:
 			dto.setCommunicating(true);
 			break;
-		case SEARCH_STATE:
+		case S_LOOKUP_STATE:
 			dto.setCommunicating(true);
 			break;
 		default:

@@ -10,7 +10,7 @@ import java.util.Queue;
 
 public class ParameterParser {
 
-    public static Queue<Parameters> parse(InputStream stream) throws IOException {
+    public static Queue<Parameters> parse(InputStream stream, boolean SRparameters) throws IOException {
 
         Queue<Parameters> parameters = new ArrayDeque<>();
 
@@ -28,7 +28,10 @@ public class ParameterParser {
                         i++;
                         break;
                     case 'C':
-                        c = interpretCPU(thisLine.substring(2));
+                        if(SRparameters)
+                            c = interpretCPU(thisLine.substring(2));
+                        else
+                            c = interpretCPU(thisLine.substring(2));
                         i++;
                         break;
                 }
@@ -71,8 +74,36 @@ public class ParameterParser {
             c.timerCpDelay = Integer.parseInt(words[4]);
             c.timerFDelay = Integer.parseInt(words[5]);
             c.timerLedDelay = Integer.parseInt(words[6]);
-            c.timerRDelay = Integer.parseInt(words[7]);
+            c.timerRCPDelay = Integer.parseInt(words[7]);
             c.timerUpDelay = Integer.parseInt(words[8]);
+            return c;
+
+        } catch (Exception e){
+            System.out.println("Incorrect parsed CPU");
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+    private static CPU interpretSRCPU(String line){
+        try{
+            String[] words = line.split(" ");
+            CPU c = new CPU();
+            c.cpuCurrentSleep_mA = Double.parseDouble(words[0]);
+            c.cpuCurrentRun_mA = Double.parseDouble(words[1]);
+            c.cpuCurrentBroadcastAvg_mA = Double.parseDouble(words[2]);
+            c.cpuCurrentConnectedAvg_mA = Double.parseDouble(words[3]);
+            c.timerCpDelay = Integer.parseInt(words[4]);
+            c.timerFDelay = Integer.parseInt(words[5]);
+            c.timerLedDelay = Integer.parseInt(words[6]);
+            c.timerRCPDelay = Integer.parseInt(words[7]);
+            c.timerUpDelay = Integer.parseInt(words[8]);
+            // SR parameters
+            c.timerIPDelay = Integer.parseInt(words[9]);
+            c.timerLPDelay = Integer.parseInt(words[10]);
+            c.timerDLPDelay = Integer.parseInt(words[11]);
+            c.timerDRPDelay = Integer.parseInt(words[12]);
             return c;
 
         } catch (Exception e){

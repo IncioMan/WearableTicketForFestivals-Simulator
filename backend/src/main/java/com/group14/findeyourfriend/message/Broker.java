@@ -1,9 +1,11 @@
-package com.group14.findeyourfriend.bracelet;
+package com.group14.findeyourfriend.message;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
 import com.group14.common_interface.Position;
+import com.group14.findeyourfriend.bracelet.Bracelet;
+import com.group14.findeyourfriend.bracelet.DatabaseEntry;
 import com.group14.findeyourfriend.statemachine.ProcessState;
 import com.group14.findeyourfriend.utils.Utils;
 
@@ -16,10 +18,16 @@ import com.group14.findeyourfriend.utils.Utils;
 public class Broker {
 	private final HashSet<Bracelet> _bracelets = new HashSet<>();
 
-	public final void DoBroadcast(int senderId, Position broadcastPosition, double range, long messageId, HashMap<Integer, DatabaseEntry> database) {
-		for (Bracelet bracelet : _bracelets) {
-			if (Utils.isReachable(broadcastPosition, bracelet.getPosition(), range) && bracelet.getStateMachine().getCurrentState() == ProcessState.COMMUNICATION_STATE) {
-				bracelet.HandleBroadcast(senderId, messageId, database);
+	//public final void DoBroadcast(int senderId, Position broadcastPosition, double range, long messageId, HashMap<Integer, DatabaseEntry> database) {
+    public final void DoBroadcast(Bracelet sender, Position broadcastPosition, double range, Message message) {
+
+        for (Bracelet bracelet : _bracelets) {
+			if (Utils.isReachable(broadcastPosition, bracelet.getPosition(), range) &&
+                    bracelet.getStateMachine().getCurrentState() == ProcessState.COMMUNICATION_STATE &&
+                    !bracelet.equals(sender)) {
+				//bracelet.HandleBroadcast(senderId, messageId, database);
+                message.setReceiver(bracelet);
+                bracelet.HandleBroadcast(message);
 			}
 		}
 

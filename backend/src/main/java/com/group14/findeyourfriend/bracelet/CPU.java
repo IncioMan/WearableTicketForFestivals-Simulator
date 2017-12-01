@@ -9,6 +9,16 @@ public class CPU {
     public int timerCpDelay;
     public int timerFDelay;
     public int timerLedDelay;
-    public int timerRDelay;
+    public int timerRCPDelay;
     public int timerUpDelay;
+
+    // SR parameters
+    public int timerIPDelay;
+    public int timerLPDelay;
+    public int timerDLPDelay;
+    public int timerDRPDelay;
+
+    public int timerRQPDelay;
+    public int timerRRPDelay;
+    public int timerRLPDelay;
 }
