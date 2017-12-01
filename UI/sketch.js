@@ -1,6 +1,6 @@
 var bubbles = [];
-var person_width = 40;
-var person_height = 40;
+var person_width = 10;
+var person_height = 10;
 var guests = [];
 var concerts = [];
 var concertImg;
@@ -14,7 +14,12 @@ class Concert{
   }
 
   show(){
-      image(this.logo, this.X, this.Y, 100, 100);
+      if(this.logo != null){
+        image(this.logo, this.X, this.Y, 100, 100);
+      }else{
+        fill('#9E9E9E');
+        rect(this.X, this.Y, 100, 50);
+      }
   }
 }
 
@@ -69,8 +74,10 @@ function setup() {
   canvas.parent('sketch-holder');
   noStroke();
   concertImg = loadImage("stage.png");
-  var url = 'http://localhost:8080/concerts'
-  loadJSON(url, drawConcerts);
+
+  // for(var i = 0; i < 800; i++){
+  //   guests.push(new Person(i, random(1200), random(800) + 200, 55, random(1) > .5));
+  // }
 }
 
 function draw(){
@@ -92,6 +99,10 @@ function mousePressed(){
 window.setInterval(function(){
   var url = 'http://localhost:8080/guests'
   loadJSON(url, drawGuests);
+  if(concerts == null){
+    var url = 'http://localhost:8080/concerts'
+    loadJSON(url, drawConcerts);
+  }
 }, 300);
 
 function drawGuests(people) {
