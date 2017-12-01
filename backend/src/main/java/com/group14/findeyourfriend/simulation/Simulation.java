@@ -81,21 +81,20 @@ public class Simulation {
 			for (Person person : guests.values())
 				person.getBracelet().transition(clock);
 
-			// System.out.println(map.AllInBound());
-
-			if (clock % 1000 == 0) {
-				// Map.clrscr();
-				// map.Print();
+			if (clock % 500 == 0) {
 				for (Person person : guests.values())
 					person.UpdatePosition();
 				if (notifier != null) {
 					notifier.notify(guests.values());
 				}
 			}
+			if(clock % 3 == 0){
+				guestsConsumers.forEach(c -> {
+					c.accept(guests.values());
+				});
+
+			}
 			clock++;
-			guestsConsumers.forEach(c -> {
-				c.accept(guests.values());
-			});
 		}
 		DebugLog.log("All events processed or simulation time has run out. Simulation finished.");
 	}
