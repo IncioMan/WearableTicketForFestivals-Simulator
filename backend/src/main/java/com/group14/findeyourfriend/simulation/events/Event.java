@@ -1,4 +1,6 @@
-package com.group14.findeyourfriend.simulation;
+package com.group14.findeyourfriend.simulation.events;
+
+import com.group14.findeyourfriend.simulation.Simulation;
 
 public abstract class Event {
 	protected int start;

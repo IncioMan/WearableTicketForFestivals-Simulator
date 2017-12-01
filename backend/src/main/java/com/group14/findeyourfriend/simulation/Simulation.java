@@ -23,6 +23,8 @@ import com.group14.findeyourfriend.bracelet.CPU;
 import com.group14.findeyourfriend.bracelet.Person;
 import com.group14.findeyourfriend.bracelet.Radio;
 import com.group14.findeyourfriend.debug.DebugLog;
+import com.group14.findeyourfriend.simulation.events.ConcertEvent;
+import com.group14.findeyourfriend.simulation.events.Event;
 
 @Component
 public class Simulation {
@@ -44,13 +46,19 @@ public class Simulation {
 		guestsConsumers = new ArrayList<>();
 	}
 
-	public void init(Queue<Event> events, int simulationTime) {
-		// notifier = new Notifier("producer", IConstants.QUEUE_NAME);
+	public void init(Queue<Event> events, int simulationTime) {// notifier = new Notifier("producer",
+																// IConstants.QUEUE_NAME);
 		clock = 0;
 		timeEvents = new HashMap<>();
+		List<ConcertEvent> concertEvents = new ArrayList<>();
+
 		while (!events.isEmpty()) {
 			Event nextEvent = events.poll();
 			nextEvent.setSimulation(this);
+
+			if (nextEvent instanceof ConcertEvent) {
+				concertEvents.add((ConcertEvent) nextEvent);
+			}
 
 			if (timeEvents.containsKey(nextEvent.getStart())) {
 				timeEvents.get(nextEvent.getStart()).add(nextEvent);
@@ -61,6 +69,7 @@ public class Simulation {
 			}
 		}
 		this.simulationTime = simulationTime;
+		notifier.notifyConcertEvents(concertEvents);
 		guests = new HashMap<>();
 		map = new Map(Constants.MAX_HEIGHT, Constants.MAX_WIDTH);
 		map.setSimulation(this);
@@ -88,7 +97,7 @@ public class Simulation {
 					notifier.notify(guests.values());
 				}
 			}
-			if(clock % 3 == 0){
+			if (clock % 3 == 0) {
 				guestsConsumers.forEach(c -> {
 					c.accept(guests.values());
 				});

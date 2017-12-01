@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.group14.findeyourfriend.bracelet.Person;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.group14.common_interface.PersonDto;
+import com.group14.findeyourfriend.bracelet.Person;
+import com.group14.findeyourfriend.simulation.events.ConcertEvent;
 
 @RestController
 public class Notifier {
 
 	private DtoConverter converter;
 	private List<PersonDto> guests;
+	private List<ConcertEvent> concertEvents;
 
 	public Notifier() {
 		converter = new DtoConverter();
@@ -46,6 +48,15 @@ public class Notifier {
 		return "Greetings from Spring Boot!";
 	}
 
+	public void notifyConcertEvents(List<ConcertEvent> concertEvents) {
+		this.concertEvents = concertEvents;
+	}
+
+	@RequestMapping("/concerts")
+	@CrossOrigin
+	public List<ConcertEvent> getConcertEvents() {
+		return concertEvents;
+	}
 	// private MessageProducer messageProducer;
 	// private DtoConverter converter;
 	// private Session session;

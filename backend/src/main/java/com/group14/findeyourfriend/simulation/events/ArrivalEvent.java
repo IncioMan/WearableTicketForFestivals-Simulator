@@ -1,4 +1,4 @@
-package com.group14.findeyourfriend.simulation;
+package com.group14.findeyourfriend.simulation.events;
 
 import java.util.List;
 

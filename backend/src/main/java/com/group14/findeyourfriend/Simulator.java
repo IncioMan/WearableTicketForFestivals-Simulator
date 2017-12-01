@@ -11,10 +11,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.group14.findeyourfriend.debug.DebugLog;
-import com.group14.findeyourfriend.simulation.Event;
-import com.group14.findeyourfriend.simulation.EventParser;
 import com.group14.findeyourfriend.simulation.Simulation;
 import com.group14.findeyourfriend.simulation.StatisticsCalculator;
+import com.group14.findeyourfriend.simulation.events.Event;
+import com.group14.findeyourfriend.simulation.events.EventParser;
 
 @SpringBootApplication
 @EnableScheduling
