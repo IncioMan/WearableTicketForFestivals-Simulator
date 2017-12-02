@@ -20,11 +20,11 @@ public class UpdateMessage extends Message{
 
     @Override
     public void process() {
-        sender.storeUpdateMessage(this);
+        receiver.storeUpdateMessage(this);
         for (int dbKey: recentLocations.keySet()) {
-            if(dbKey == sender.getPerson().getId()) continue; //Dont update my own position
+            if(dbKey == receiver.getPerson().getId()) continue; //Dont update my own position
             DatabaseEntry entry = recentLocations.get(dbKey);
-            if(entry.getTimeStamp() > sender.getDataBase().getOrDefault(dbKey, new DatabaseEntry()).getTimeStamp()) sender.getDataBase().put(dbKey, entry); // update or overwrite
+            if(entry.getTimeStamp() > receiver.getDataBase().getOrDefault(dbKey, new DatabaseEntry()).getTimeStamp()) receiver.getDataBase().put(dbKey, entry); // update or overwrite
         }
     }
 

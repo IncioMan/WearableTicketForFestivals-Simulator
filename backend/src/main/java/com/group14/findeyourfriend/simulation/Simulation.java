@@ -95,7 +95,7 @@ public class Simulation {
 					notifier.notify(guests.values());
 				}
 			}
-			if (clock % 3 == 0) {
+			if (clock % 10 == 0) {
 				guestsConsumers.forEach(c -> {
 					c.accept(guests.values());
 				});

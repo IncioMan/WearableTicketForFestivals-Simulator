@@ -289,16 +289,22 @@ public class Bracelet {
 //		HashSet<Long> senderMessageIds = receivedMessages.getOrDefault(senderId, new HashSet<>());
 //		if(senderMessageIds.contains(messageId)) return; // Only handle received message once
 //        receivedMessages.put(senderId, senderMessageIds);// Add to received messages
-		synchronized (_dbLock) // Thread safety locking
-		{
-		    msg.process();
-//		    for (int dbKey: senderDataBase.keySet()) {
-//                if(dbKey == person.getId()) continue; //Dont update my own position
-//                DatabaseEntry entry = senderDataBase.get(dbKey);
-//                if(entry.getTimeStamp() > dataBase.getOrDefault(dbKey, new DatabaseEntry()).getTimeStamp()) dataBase.put(dbKey, entry); // update or overwrite
-//            }
-//			DebugLog.logTimer(person.getId() + ": HEARD IT FROM " + senderId);
+
+		if (!msg.isSeen(person.getId())){
+
+			synchronized (_dbLock) // Thread safety locking
+			{
+				msg.process();
+	//		    for (int dbKey: senderDataBase.keySet()) {
+	//                if(dbKey == person.getId()) continue; //Dont update my own position
+	//                DatabaseEntry entry = senderDataBase.get(dbKey);
+	//                if(entry.getTimeStamp() > dataBase.getOrDefault(dbKey, new DatabaseEntry()).getTimeStamp()) dataBase.put(dbKey, entry); // update or overwrite
+	//            }
+	//			DebugLog.logTimer(person.getId() + ": HEARD IT FROM " + senderId);
+			}
+
 		}
+
 	}
 
 	public void StartSearch(Person person) {
@@ -357,7 +363,8 @@ public class Bracelet {
         dbE.setTimeStamp(System.currentTimeMillis());
         dataBase.put(person.getId(), dbE);
 	    UpdateMessage updateMessage = new UpdateMessage(this, dataBase);
-        _broker.DoBroadcast(this, getPosition(), radio.getRange_M(), updateMessage);
+	    storeUpdateMessage(updateMessage);
+        //_broker.DoBroadcast(this, getPosition(), radio.getRange_M(), updateMessage);
 
 //	    int myId = person.getId();
 //        HashSet<Long> myMessages = receivedMessages.getOrDefault(myId, new HashSet<>());
@@ -375,7 +382,7 @@ public class Bracelet {
         Message msg;
 	    while(!messages.isEmpty()){
             msg = messages.pop();
-            _broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
+            _broker.Relay(this, getPosition(), radio.getRange_M(), msg);
         }
     }
 

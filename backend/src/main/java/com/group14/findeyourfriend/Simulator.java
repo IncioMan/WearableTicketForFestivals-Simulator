@@ -28,7 +28,7 @@ public class Simulator {
 
 	public static void main(String[] args) {
 		DebugLog.setEnabled(true);
-		DebugLog.setEnabledTimers(true);
+		DebugLog.setEnabledTimers(false);
 		SpringApplication.run(Simulator.class, args);
 		// Simulator simulator = ctx.getBean(Simulator.class);
 		// simulator.start();

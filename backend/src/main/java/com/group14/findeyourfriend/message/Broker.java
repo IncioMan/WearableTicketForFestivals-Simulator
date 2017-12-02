@@ -1,11 +1,9 @@
 package com.group14.findeyourfriend.message;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 import com.group14.common_interface.Position;
 import com.group14.findeyourfriend.bracelet.Bracelet;
-import com.group14.findeyourfriend.bracelet.DatabaseEntry;
 import com.group14.findeyourfriend.statemachine.ProcessState;
 import com.group14.findeyourfriend.utils.Utils;
 
@@ -30,7 +28,20 @@ public class Broker {
                 bracelet.HandleBroadcast(message);
 			}
 		}
+	}
 
+	public final void Relay(Bracelet sender, Position broadcastPosition, double range, Message message) {
+
+		for (Bracelet bracelet : _bracelets) {
+			if (Utils.isReachable(broadcastPosition, bracelet.getPosition(), range) &&
+					!bracelet.equals(sender) &&
+					bracelet.getStateMachine().getCurrentState() != ProcessState.SLEEP_STATE){
+				//bracelet.HandleBroadcast(senderId, messageId, database);
+				message.setReceiver(bracelet);
+				bracelet.HandleBroadcast(message);
+				message.setSeenBracelet(bracelet.getPerson().getId());
+			}
+		}
 	}
 
 	public final void AddBracelet(Bracelet bracelet) {
