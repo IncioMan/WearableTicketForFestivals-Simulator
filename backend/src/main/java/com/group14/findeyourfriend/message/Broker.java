@@ -23,8 +23,8 @@ public class Broker {
 
         for (Bracelet bracelet : _bracelets) {
 			if (Utils.isReachable(broadcastPosition, bracelet.getPosition(), range) &&
-                    bracelet.getStateMachine().getCurrentState() == ProcessState.COMMUNICATION_STATE &&
-                    !bracelet.equals(sender)) {
+                    !bracelet.equals(sender) &&
+					bracelet.getStateMachine().getCurrentState() != ProcessState.SLEEP_STATE){
 				//bracelet.HandleBroadcast(senderId, messageId, database);
                 message.setReceiver(bracelet);
                 bracelet.HandleBroadcast(message);

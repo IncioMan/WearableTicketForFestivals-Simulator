@@ -22,9 +22,9 @@ public class ChartSimulator {
             InputStream eventStream = Simulator.class.getClassLoader().getResourceAsStream("events.txt");
             InputStream paramStream = Simulator.class.getClassLoader().getResourceAsStream("params.txt");
             Queue<Event> events = EventParser.parse(eventStream);
-            Queue<Parameters> parameters = ParameterParser.parse(paramStream);
+            Queue<Parameters> parameters = ParameterParser.parse(paramStream, false);
             Simulation simulation= new Simulation();
-            simulation.init(events, 86400000*1);// Simulate 1 days in ms * days
+            simulation.init(events, false, 86400000*1);// Simulate 1 days in ms * days
             simulation.run(parameters.poll());
             Chart.main(new String[0]);// Show chart
         } catch (IOException e) {

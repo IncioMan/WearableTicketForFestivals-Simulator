@@ -1,9 +1,6 @@
 package com.group14.findeyourfriend.message;
 
-import com.group14.common_interface.Position;
-import com.group14.findeyourfriend.bracelet.Bracelet;
 import com.group14.findeyourfriend.bracelet.DatabaseEntry;
-import com.group14.findeyourfriend.bracelet.Person;
 import com.group14.findeyourfriend.bracelet.SRBracelet;
 
 import java.util.HashMap;
@@ -11,7 +8,7 @@ import java.util.HashMap;
 public class SearchResponse extends Message{
 
     private SRBracelet sender;
-    // inherits receiver
+    private SRBracelet receiver;
     // inherits timestamp
     private HashMap<Integer, DatabaseEntry> searchedLocations = new HashMap<>();
 
@@ -23,11 +20,11 @@ public class SearchResponse extends Message{
 
     @Override
     public void process() {
-        sender.storeSearchResponse(this);
+        receiver.storeSearchResponseToRelay(this);
         for (int dbKey: searchedLocations.keySet()) {
-            if(dbKey == sender.getPerson().getId()) continue; //Dont update my own position
+            if(dbKey == receiver.getPerson().getId()) continue; //Dont update my own position
             DatabaseEntry entry = searchedLocations.get(dbKey);
-            if(entry.getTimeStamp() > sender.getDataBase().getOrDefault(dbKey, new DatabaseEntry()).getTimeStamp()) sender.getDataBase().put(dbKey, entry); // update or overwrite
+            if(entry.getTimeStamp() > receiver.getDataBase().getOrDefault(dbKey, new DatabaseEntry()).getTimeStamp()) receiver.getDataBase().put(dbKey, entry); // update or overwrite
         }
     }
 }
