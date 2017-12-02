@@ -290,8 +290,6 @@ public class Bracelet {
 //		if(senderMessageIds.contains(messageId)) return; // Only handle received message once
 //        receivedMessages.put(senderId, senderMessageIds);// Add to received messages
 
-		if (!msg.isSeen(person.getId())){
-
 			synchronized (_dbLock) // Thread safety locking
 			{
 				msg.process();
@@ -303,7 +301,6 @@ public class Bracelet {
 	//			DebugLog.logTimer(person.getId() + ": HEARD IT FROM " + senderId);
 			}
 
-		}
 
 	}
 
@@ -382,7 +379,7 @@ public class Bracelet {
         Message msg;
 	    while(!messages.isEmpty()){
             msg = messages.pop();
-            _broker.Relay(this, getPosition(), radio.getRange_M(), msg);
+            _broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
         }
     }
 

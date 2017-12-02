@@ -53,14 +53,19 @@ public class SRBracelet extends Bracelet{
                 break;
             case REQUEST_STATE:
                 RequestState();
+                break;
             case INTERPRET_STATE:
                 InterpretState();
+                break;
             case LISTEN_STATE:
                 ListenState();
+                break;
             case R_LOOKUP_STATE:
                 RLookupState();
+                break;
             case RESPONSE_STATE:
                 ResponseState();
+                break;
             default:
                 DebugLog.log(person.getId() + ": In DefaultState");
                 break;
@@ -71,16 +76,26 @@ public class SRBracelet extends Bracelet{
         timerRRPRun = true;
         timerDRPRun = true;
 
-        BroadcastSearchResponses();
-        RelayMessages(searchRequestsToRelay);
-        RelayMessages(searchResponsesToRelay);
+        synchronized (_stateLock) {
+            if (stateMachine.getCurrentState() == ProcessState.RESPONSE_STATE) {
+                DebugLog.log(person.getId() + ": Broadcasting search responses");
+                BroadcastSearchResponses();
+                RelayMessages(searchRequestsToRelay);
+                RelayMessages(searchResponsesToRelay);
+            }
+        }
+
     }
 
     private void RLookupState() {
-        if (!searchResponsesToBroadcast.empty()){
-            synchronized (_stateLock) {
-                if (stateMachine.getCurrentState() == ProcessState.R_LOOKUP_STATE) {
+        synchronized (_stateLock) {
+            if (stateMachine.getCurrentState() == ProcessState.R_LOOKUP_STATE) {
+                if (!searchResponsesToBroadcast.empty()){
                     stateMachine.MoveNext(Command.SendResponse); // to Response phase
+                    RunBracelet();
+                }
+                else{
+                    stateMachine.MoveNext(Command.NoResponse); // to Update phase
                     RunBracelet();
                 }
             }
@@ -88,15 +103,28 @@ public class SRBracelet extends Bracelet{
     }
 
     private void ListenState() {
-        RelayMessages(searchRequestsToRelay);
-        RelayMessages(searchResponsesToRelay);
+        timerRLPRun = true;
+        timerDLPRun = true;
+
+        synchronized (_stateLock) {
+            if (stateMachine.getCurrentState() == ProcessState.LISTEN_STATE) {
+                DebugLog.log(person.getId() + ": Listening for search requests");
+                RelayMessages(searchRequestsToRelay);
+                RelayMessages(searchResponsesToRelay);
+            }
+        }
+
     }
 
     private void InterpretState() {
-        if (dataBase.containsKey(_lookForPerson.getId())){
-            synchronized (_stateLock) {
-                if (stateMachine.getCurrentState() == ProcessState.INTERPRET_STATE) {
+        synchronized (_stateLock) {
+            if (stateMachine.getCurrentState() == ProcessState.INTERPRET_STATE) {
+                if (dataBase.containsKey(_lookForPerson.getId())){
                     stateMachine.MoveNext(Command.FriendFound); // to LED phase
+                    RunBracelet();
+                }
+                else{
+                    stateMachine.MoveNext(Command.FriendNotFound); // to Sleep
                     RunBracelet();
                 }
             }
@@ -104,11 +132,16 @@ public class SRBracelet extends Bracelet{
     }
 
     private void RequestState() {
-        _timerRCPRun = true;
+        timerRQPRun = true;
         timerIPRun = true;
 
-        BroadcastSearchRequest();
-        RelayMessages(searchRequestsToRelay);
+        synchronized (_stateLock) {
+            if (stateMachine.getCurrentState() == ProcessState.REQUEST_STATE) {
+                BroadcastSearchRequest();
+                RelayMessages(searchRequestsToRelay);
+            }
+        }
+
     }
 
 
@@ -174,33 +207,58 @@ public class SRBracelet extends Bracelet{
     }
 
     private void OnTimerRQP() {
-        BroadcastSearchRequest();
-        RelayMessages(searchRequestsToRelay);
-        RelayMessages(searchResponsesToRelay);
+        synchronized (_stateLock) {
+            if (stateMachine.getCurrentState() == ProcessState.REQUEST_STATE) {
+                DebugLog.logTimer(person.getId() + ": OnTimerRQP");
+                BroadcastSearchRequest();
+                RelayMessages(searchRequestsToRelay);
+                RelayMessages(searchResponsesToRelay);
+            }
+        }
     }
 
     private void BroadcastSearchRequest() {
-        SearchRequest msg = new SearchRequest(this, _lookForPerson.getId());
-        _broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
+        synchronized (_stateLock) {
+            if (stateMachine.getCurrentState() == ProcessState.REQUEST_STATE) {
+                SearchRequest msg = new SearchRequest(this, _lookForPerson.getId());
+                _broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
+                DebugLog.logTimer(person.getId() + ": Broadcast Search Request");
+            }
+        }
     }
 
     private void OnTimerRRP() {
-        BroadcastSearchResponses();
-        RelayMessages(searchRequestsToRelay);
-        RelayMessages(searchResponsesToRelay);
+        synchronized (_stateLock) {
+            if (stateMachine.getCurrentState() == ProcessState.RESPONSE_STATE) {
+                DebugLog.logTimer(person.getId() + ": OnTimerRRP");
+                BroadcastSearchResponses();
+                RelayMessages(searchRequestsToRelay);
+                RelayMessages(searchResponsesToRelay);
+            }
+        }
+
     }
 
     private void BroadcastSearchResponses() {
-        Message msg;
-        while(!searchResponsesToBroadcast.empty()){
-            msg = searchResponsesToBroadcast.pop();
-            _broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
+        synchronized (_stateLock) {
+            if (stateMachine.getCurrentState() == ProcessState.RESPONSE_STATE) {
+                Message msg;
+                while(!searchResponsesToBroadcast.empty()){
+                    msg = searchResponsesToBroadcast.pop();
+                    _broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
+                }
+            }
         }
     }
 
     private void OnTimerRLP() {
-        RelayMessages(searchRequestsToRelay);
-        RelayMessages(searchResponsesToRelay);
+        synchronized (_stateLock) {
+            if (stateMachine.getCurrentState() == ProcessState.LISTEN_STATE) {
+                DebugLog.logTimer(person.getId() + ": OnTimerRLP");
+                RelayMessages(searchRequestsToRelay);
+                RelayMessages(searchResponsesToRelay);
+            }
+        }
     }
 
     private void OnTimerDRP() {
@@ -218,7 +276,7 @@ public class SRBracelet extends Bracelet{
 
     private void OnTimerDLP() {
         timerDLPRun = false;
-        timerRRPRun = false;
+        timerRLPRun = false;
 
         synchronized (_stateLock) {
             if (stateMachine.getCurrentState() == ProcessState.LISTEN_STATE) {
@@ -230,6 +288,10 @@ public class SRBracelet extends Bracelet{
     }
 
     private void OnTimerLP() {
+
+        timerDLPRun = true;
+        timerRRPRun = true;
+
         synchronized (_stateLock) {
             if (stateMachine.getCurrentState() == ProcessState.SLEEP_STATE) {
                 DebugLog.logTimer(person.getId() + ": OnTimerLP");

@@ -104,6 +104,9 @@ public class ParameterParser {
             c.timerLPDelay = Integer.parseInt(words[10]);
             c.timerDLPDelay = Integer.parseInt(words[11]);
             c.timerDRPDelay = Integer.parseInt(words[12]);
+            c.timerRQPDelay = Integer.parseInt(words[13]);
+            c.timerRRPDelay = Integer.parseInt(words[14]);
+            c.timerRLPDelay = Integer.parseInt(words[15]);
             return c;
 
         } catch (Exception e){

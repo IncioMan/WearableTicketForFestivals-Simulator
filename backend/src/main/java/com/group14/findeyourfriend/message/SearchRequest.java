@@ -8,7 +8,6 @@ import java.util.HashMap;
 public class SearchRequest extends Message{
 
     private SRBracelet sender;
-    private SRBracelet receiver;
     // inherits timestamp
     private int preyID;
 
@@ -20,12 +19,13 @@ public class SearchRequest extends Message{
 
     @Override
     public void process() {
-        receiver.storeSearchRequest(this);
-        if (receiver.getDataBase().containsKey(preyID)){
+        SRBracelet SRreceiver = (SRBracelet) receiver;
+        SRreceiver.storeSearchRequest(this);
+        if (SRreceiver.getDataBase().containsKey(preyID)){
             HashMap<Integer, DatabaseEntry> locations = new HashMap<>();
-            locations.put(preyID, receiver.getDataBase().get(preyID));
-            SearchResponse msg = new SearchResponse(receiver, locations);
-            receiver.storeSearchResponseToBroadcast(msg);
+            locations.put(preyID, SRreceiver.getDataBase().get(preyID));
+            SearchResponse msg = new SearchResponse(SRreceiver, locations);
+            SRreceiver.storeSearchResponseToBroadcast(msg);
             // TODO improve logic to include locations in only one message?
         }
     }

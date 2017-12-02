@@ -28,7 +28,7 @@ public class Simulator {
 
 	public static void main(String[] args) {
 		DebugLog.setEnabled(true);
-		DebugLog.setEnabledTimers(false);
+		DebugLog.setEnabledTimers(true);
 		SpringApplication.run(Simulator.class, args);
 		// Simulator simulator = ctx.getBean(Simulator.class);
 		// simulator.start();
@@ -38,12 +38,12 @@ public class Simulator {
 	public void start() {
 		try {
 			InputStream eventStream = Simulator.class.getClassLoader().getResourceAsStream("events.txt");
-			InputStream paramStream = Simulator.class.getClassLoader().getResourceAsStream("params.txt");
-			//InputStream paramStream = Simulator.class.getClassLoader().getResourceAsStream("SRparams.txt");
+			//InputStream paramStream = Simulator.class.getClassLoader().getResourceAsStream("params.txt");
+			InputStream paramStream = Simulator.class.getClassLoader().getResourceAsStream("SRparams.txt");
 			Queue<Event> events = EventParser.parse(eventStream);
-			Queue<Parameters> params = ParameterParser.parse(paramStream, false);
+			Queue<Parameters> params = ParameterParser.parse(paramStream, true);
 			simulation.add(calculator::calculate);
-			simulation.init(events, false, 86400000);// Simulate 1 days in ms
+			simulation.init(events, true, 86400000);// Simulate 1 days in ms
 			simulation.run(params.poll());
 			// Chart.main(new String[0]);// Show chart
 		} catch (IOException e) {

@@ -18,28 +18,16 @@ public class Broker {
 
 	//public final void DoBroadcast(int senderId, Position broadcastPosition, double range, long messageId, HashMap<Integer, DatabaseEntry> database) {
     public final void DoBroadcast(Bracelet sender, Position broadcastPosition, double range, Message message) {
-
         for (Bracelet bracelet : _bracelets) {
 			if (Utils.isReachable(broadcastPosition, bracelet.getPosition(), range) &&
                     !bracelet.equals(sender) &&
 					bracelet.getStateMachine().getCurrentState() != ProcessState.SLEEP_STATE){
 				//bracelet.HandleBroadcast(senderId, messageId, database);
-                message.setReceiver(bracelet);
-                bracelet.HandleBroadcast(message);
-			}
-		}
-	}
-
-	public final void Relay(Bracelet sender, Position broadcastPosition, double range, Message message) {
-
-		for (Bracelet bracelet : _bracelets) {
-			if (Utils.isReachable(broadcastPosition, bracelet.getPosition(), range) &&
-					!bracelet.equals(sender) &&
-					bracelet.getStateMachine().getCurrentState() != ProcessState.SLEEP_STATE){
-				//bracelet.HandleBroadcast(senderId, messageId, database);
-				message.setReceiver(bracelet);
-				bracelet.HandleBroadcast(message);
-				message.setSeenBracelet(bracelet.getPerson().getId());
+                if (!message.isSeen(bracelet.getPerson().getId())){
+                    message.setReceiver(bracelet);
+                    bracelet.HandleBroadcast(message);
+                    message.setSeenBracelet(bracelet.getPerson().getId());
+                }
 			}
 		}
 	}

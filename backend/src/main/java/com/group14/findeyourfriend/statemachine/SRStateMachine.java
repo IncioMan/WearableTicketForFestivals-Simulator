@@ -28,10 +28,17 @@ public class SRStateMachine extends StateMachineProcess{
         _transitions.put(new StateTransition(ProcessState.R_LOOKUP_STATE, Command.SendResponse), ProcessState.RESPONSE_STATE);
         _transitions.put(new StateTransition(ProcessState.R_LOOKUP_STATE, Command.NoResponse), ProcessState.UPDATE_STATE);
 
+        _transitions.put(new StateTransition(ProcessState.RESPONSE_STATE, Command.TimerDRP), ProcessState.UPDATE_STATE);
+
         _transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
         _transitions.put(new StateTransition(ProcessState.COMMUNICATION_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
         _transitions.put(new StateTransition(ProcessState.LED_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
         _transitions.put(new StateTransition(ProcessState.UPDATE_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
+        _transitions.put(new StateTransition(ProcessState.LISTEN_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
+        _transitions.put(new StateTransition(ProcessState.R_LOOKUP_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
+        _transitions.put(new StateTransition(ProcessState.RESPONSE_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
+        _transitions.put(new StateTransition(ProcessState.REQUEST_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
+        _transitions.put(new StateTransition(ProcessState.INTERPRET_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
     }
 
 }
