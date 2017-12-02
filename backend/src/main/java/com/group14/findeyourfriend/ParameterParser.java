@@ -29,7 +29,7 @@ public class ParameterParser {
                         break;
                     case 'C':
                         if(SRparameters)
-                            c = interpretCPU(thisLine.substring(2));
+                            c = interpretSRCPU(thisLine.substring(2));
                         else
                             c = interpretCPU(thisLine.substring(2));
                         i++;

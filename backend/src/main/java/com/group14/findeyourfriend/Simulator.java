@@ -27,8 +27,8 @@ public class Simulator {
 	private StatisticsCalculator calculator;
 
 	public static void main(String[] args) {
-		DebugLog.setEnabled(false);
-		DebugLog.setEnabledTimers(false);
+		DebugLog.setEnabled(true);
+		DebugLog.setEnabledTimers(true);
 		SpringApplication.run(Simulator.class, args);
 		// Simulator simulator = ctx.getBean(Simulator.class);
 		// simulator.start();
@@ -41,7 +41,7 @@ public class Simulator {
 			InputStream paramStream = Simulator.class.getClassLoader().getResourceAsStream("params.txt");
 			//InputStream paramStream = Simulator.class.getClassLoader().getResourceAsStream("SRparams.txt");
 			Queue<Event> events = EventParser.parse(eventStream);
-			Queue<Parameters> params = ParameterParser.parse(paramStream, true);
+			Queue<Parameters> params = ParameterParser.parse(paramStream, false);
 			simulation.add(calculator::calculate);
 			simulation.init(events, false, 86400000);// Simulate 1 days in ms
 			simulation.run(params.poll());

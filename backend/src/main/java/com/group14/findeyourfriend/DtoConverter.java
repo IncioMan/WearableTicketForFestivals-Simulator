@@ -15,6 +15,7 @@ public class DtoConverter {
 		dto.setPosition(model.getPosition());
 		dto.setRange(model.getBracelet().getRadioRange());
 		switch (model.getBracelet().getStateMachine().getCurrentState()) {
+			// TODO
 		case COMMUNICATION_STATE:
 			dto.setCommunicating(true);
 			break;
