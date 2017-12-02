@@ -43,6 +43,9 @@ public class StatisticsCalculator {
 		totalAverageAgeInDatabase = Pair.of(0d, 0);
 		totalPercentagePeopleInDatabase = Pair.of(0d, 0);
 		totalPercentageRecentLocationsInDatabase = Pair.of(0d, 0);
+		currentAverageAgeInDatabase = Pair.of(0d, 0);
+		currentPercentagePeopleInDatabase = Pair.of(0d, 0);
+		currentPercentageRecentLocationsInDatabase = Pair.of(0d, 0);
 		getCurrentTime = () -> System.currentTimeMillis();
 	}
 

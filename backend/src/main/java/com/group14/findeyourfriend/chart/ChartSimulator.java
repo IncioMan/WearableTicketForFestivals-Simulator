@@ -1,17 +1,16 @@
 package com.group14.findeyourfriend.chart;
 
-import com.group14.findeyourfriend.ParameterParser;
-import com.group14.findeyourfriend.Parameters;
-import com.group14.findeyourfriend.Simulator;
-import com.group14.findeyourfriend.chart.Chart;
-import com.group14.findeyourfriend.debug.DebugLog;
-import com.group14.findeyourfriend.simulation.Event;
-import com.group14.findeyourfriend.simulation.EventParser;
-import com.group14.findeyourfriend.simulation.Simulation;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Queue;
+
+import com.group14.findeyourfriend.ParameterParser;
+import com.group14.findeyourfriend.Parameters;
+import com.group14.findeyourfriend.Simulator;
+import com.group14.findeyourfriend.debug.DebugLog;
+import com.group14.findeyourfriend.simulation.Simulation;
+import com.group14.findeyourfriend.simulation.events.Event;
+import com.group14.findeyourfriend.simulation.events.EventParser;
 
 public class ChartSimulator {
 

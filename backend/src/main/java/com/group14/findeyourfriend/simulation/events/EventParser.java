@@ -1,4 +1,4 @@
-package com.group14.findeyourfriend.simulation;
+package com.group14.findeyourfriend.simulation.events;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
+import com.group14.common_interface.Position;
 import com.group14.findeyourfriend.bracelet.Person;
 import com.group14.findeyourfriend.debug.DebugLog;
 
@@ -23,12 +24,12 @@ public class EventParser {
 
 		String thisLine;
 
-		BufferedReader in = new BufferedReader(new FileReader(s));
-
-		while ((thisLine = in.readLine()) != null) {
-			if (!thisLine.startsWith("#")) {
-				Event e = interpretLine(thisLine);
-				simulationEvents.add(e);
+		try (BufferedReader in = new BufferedReader(new FileReader(s))) {
+			while ((thisLine = in.readLine()) != null) {
+				if (!thisLine.startsWith("#")) {
+					Event e = interpretLine(thisLine);
+					simulationEvents.add(e);
+				}
 			}
 		}
 
@@ -86,10 +87,20 @@ public class EventParser {
 			sEvent.setPreyName(words[2].split(",")[1]);
 			// TODO Add set ID of hunter/prey
 			return sEvent;
+
+		case "C":
+			// example of CONCERT: C 1500 10,20 1,2,3,4
+			// (10,20) is the location of the event
+			// 1,2,3,4 are people that will go to that concert
+			ConcertEvent concertEvent = new ConcertEvent();
+			Position concertPosition = new Position(Float.parseFloat(words[2].split(",")[0]),
+					Float.parseFloat(words[2].split(",")[1]));
+			concertEvent.setGuestsToConcert(words[3].split(","));
+			concertEvent.setConcertLocation(concertPosition);
+			// TODO Add set ID of hunter/prey
+			return concertEvent;
 		default:
 			throw new IOException("Incorrect event in event list");
 		}
-
 	}
-
 }

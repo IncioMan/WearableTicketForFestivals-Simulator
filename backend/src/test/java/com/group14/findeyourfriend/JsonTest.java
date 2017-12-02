@@ -4,14 +4,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.group14.findeyourfriend.bracelet.Person;
-import com.group14.findeyourfriend.simulation.ArrivalEvent;
-import com.group14.findeyourfriend.simulation.Event;
-import com.group14.findeyourfriend.simulation.SearchEvent;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
+
+import com.group14.findeyourfriend.bracelet.Person;
+import com.group14.findeyourfriend.simulation.events.ArrivalEvent;
+import com.group14.findeyourfriend.simulation.events.Event;
+import com.group14.findeyourfriend.simulation.events.SearchEvent;
 
 public class JsonTest {
 	@Test
