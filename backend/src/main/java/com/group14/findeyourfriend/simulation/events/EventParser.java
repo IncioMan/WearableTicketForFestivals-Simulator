@@ -93,11 +93,11 @@ public class EventParser {
 			// (10,20) is the location of the event
 			// 1,2,3,4 are people that will go to that concert
 			ConcertEvent concertEvent = new ConcertEvent();
+			concertEvent.setStart(words[1]);
 			Position concertPosition = new Position(Float.parseFloat(words[2].split(",")[0]),
 					Float.parseFloat(words[2].split(",")[1]));
 			concertEvent.setGuestsToConcert(words[3].split(","));
 			concertEvent.setConcertLocation(concertPosition);
-			// TODO Add set ID of hunter/prey
 			return concertEvent;
 		default:
 			throw new IOException("Incorrect event in event list");

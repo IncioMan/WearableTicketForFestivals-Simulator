@@ -44,7 +44,7 @@ public class Bracelet {
 
 	protected Broker _broker;
 
-    protected Stack<Message> updateMessages = new Stack<>();
+    protected ArrayList<Message> updateMessagesToRelay = new ArrayList<>();
 
 	protected final HashMap<Integer, DatabaseEntry> dataBase = new HashMap<>();
 
@@ -153,15 +153,15 @@ public class Bracelet {
 		_timerRCPRun = true;
 		_timerUpRun = true;
 
-        BroadcastUpdateMessage();
-        RelayMessages(updateMessages);
+        CreateUpdateMessage();
+        BroadcastMessages(updateMessagesToRelay);
 
 		battery.DecrementEnergy(cpu.cpuCurrentBroadcastAvg_mA, cpu.timerUpDelay);// Decrement battery from CPU for the
-																					// entire BroadcastUpdateMessage
+																					// entire CreateUpdateMessage
         // TODO decrement more energy for the relay?
 		// radio.setState(RadioState.Transmitting);
 		// battery.DecrementEnergy(radio.getConsumption(), broadcastTime);// Decrement
-		// from radio for single BroadcastUpdateMessage
+		// from radio for single CreateUpdateMessage
 		// radio.setState(RadioState.Passive);
 
 		DebugLog.log(person.getId() + ": Broadcasting, collecting recent and relaying recent");
@@ -246,8 +246,8 @@ public class Bracelet {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.COMMUNICATION_STATE) {
 				DebugLog.logTimer(person.getId() + ": Rebroadcast");
-				BroadcastUpdateMessage();
-				RelayMessages(updateMessages);
+				CreateUpdateMessage();
+				BroadcastMessages(updateMessagesToRelay);
 				// radio.setState(RadioState.Transmitting);
 				// battery.DecrementEnergy(radio.getConsumption(), broadcastTime);
 				// radio.setState(RadioState.Passive);
@@ -260,12 +260,13 @@ public class Bracelet {
 	 * Method run once the Update database timer is elapsed
 	 */
     protected void OnTimerUp() {
-		_timerRCPRun = false;
-		_timerUpRun = false;
+        _timerRCPRun = false;
+        _timerUpRun = false;
 		// _timerUp.cancel(); // Stop the timer from happening when not usefull
 		// _timerR.cancel(); // Stop the rebroadcast timer
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.COMMUNICATION_STATE) {
+                updateMessagesToRelay = new ArrayList<>();
 				DebugLog.logTimer(person.getId() + ": OnTimerUp");
 				stateMachine.MoveNext(Command.TimerUp);
 				RunBracelet();
@@ -279,7 +280,7 @@ public class Bracelet {
 	}
 
 	/**
-	 * Method to handle incoming BroadcastUpdateMessage
+	 * Method to handle incoming CreateUpdateMessage
 	 *
 	 */
 	public final void HandleBroadcast(Message msg) {
@@ -306,7 +307,7 @@ public class Bracelet {
 
 	public void StartSearch(Person person) {
 		synchronized (_stateLock) {
-			DebugLog.log(this.person.getId() + ": StartSearch for: " + person.getId());
+			DebugLog.log(this.person.getId() + ": started searching for " + person.getId());
 			_lookForPerson = person;
 			stateMachine.MoveNext(Command.StartSearch);
 			RunBracelet();
@@ -351,10 +352,10 @@ public class Bracelet {
     // add messageID to myMessages with current timestamp
     // put myMessages in receivedMessages
     // create a DBentry with my position, put it in the db
-    // BroadcastUpdateMessage (ID, position, range, messageID, db)
+    // CreateUpdateMessage (ID, position, range, messageID, db)
 
     //
-	private void BroadcastUpdateMessage(){
+	private void CreateUpdateMessage(){
         DatabaseEntry dbE = new DatabaseEntry();
         dbE.setPosition(getPosition());
         dbE.setTimeStamp(System.currentTimeMillis());
@@ -375,12 +376,11 @@ public class Bracelet {
 //        _broker.DoBroadcast(person.getId(), getPosition(), radio.getRange_M(), updateMessage);
     }
 
-    protected void RelayMessages(Stack<Message> messages){
-        Message msg;
-	    while(!messages.isEmpty()){
-            msg = messages.pop();
-            _broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
-        }
+    protected void BroadcastMessages(ArrayList<Message> messages){
+        for(Message msg : messages){
+        	_broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
+		}
+
     }
 
 	public void transition(int clock) {
@@ -417,6 +417,6 @@ public class Bracelet {
     }
 
     public void storeUpdateMessage(UpdateMessage msg) {
-        updateMessages.add(msg);
+        updateMessagesToRelay.add(msg);
     }
 }

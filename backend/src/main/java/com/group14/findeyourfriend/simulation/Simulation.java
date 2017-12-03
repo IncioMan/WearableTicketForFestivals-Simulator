@@ -125,7 +125,7 @@ public class Simulation {
 			float x = (float) randomX / 10;
 			float y = (float) randomY / 10;
 			guest.setSpeed(Vector2.Normalize(new Vector2(x, y)));
-
+			DebugLog.log("ArrivalEvent: guest " + guest.getId() + " arrived");
 			guests.put(guest.getId(), guest);
 		}
 	}

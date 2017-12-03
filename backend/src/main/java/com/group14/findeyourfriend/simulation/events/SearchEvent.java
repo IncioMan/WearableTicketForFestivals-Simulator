@@ -17,8 +17,8 @@ public class SearchEvent extends Event {
 			if (h.getName().equals(hunterName)) {
 				for (Person p : sim.getGuests()) {
 					if (p.getName().equals(preyName)) {
+						DebugLog.log("SearchEvent: " + h.toString() + " searching for " + p.toString());
 						h.getBracelet().StartSearch(p);
-						DebugLog.log("SearchTimer: " + h.toString() + " searching for " + p.toString());
 					}
 				}
 			}
