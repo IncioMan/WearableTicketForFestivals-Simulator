@@ -247,7 +247,7 @@ public class Bracelet {
 			if (stateMachine.getCurrentState() == ProcessState.COMMUNICATION_STATE) {
 				DebugLog.logTimer(person.getId() + ": Rebroadcast");
 				CreateUpdateMessage();
-				BroadcastMessages(updateMessagesToRelay);
+				// BroadcastMessages(updateMessagesToRelay);
 				// radio.setState(RadioState.Transmitting);
 				// battery.DecrementEnergy(radio.getConsumption(), broadcastTime);
 				// radio.setState(RadioState.Passive);
@@ -361,8 +361,8 @@ public class Bracelet {
         dbE.setTimeStamp(System.currentTimeMillis());
         dataBase.put(person.getId(), dbE);
 	    UpdateMessage updateMessage = new UpdateMessage(this, dataBase);
-	    storeUpdateMessage(updateMessage);
-        //_broker.DoBroadcast(this, getPosition(), radio.getRange_M(), updateMessage);
+	    //storeUpdateMessage(updateMessage);
+        _broker.DoBroadcast(this, getPosition(), radio.getRange_M(), updateMessage);
 
 //	    int myId = person.getId();
 //        HashSet<Long> myMessages = receivedMessages.getOrDefault(myId, new HashSet<>());

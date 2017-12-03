@@ -76,7 +76,6 @@ public class Simulation {
 	public void run(Parameters parameters) {
 		this.radio = parameters.radio;
 		this.cpu = parameters.cpu;
-		// TODO implement parameter passing with Simulator
 		battery = new Battery(225); // Coincell battery
 		// radio = new Radio(1000, 0.01, 7.0, 5);
 

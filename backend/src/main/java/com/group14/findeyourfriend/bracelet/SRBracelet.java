@@ -34,6 +34,8 @@ public class SRBracelet extends Bracelet{
         stateMachine = new SRStateMachine();
     }
 
+    // TODO override communication phase to also relay search requests and responses
+
     @Override
     public void RunBracelet() {
         switch (stateMachine.getCurrentState()) {

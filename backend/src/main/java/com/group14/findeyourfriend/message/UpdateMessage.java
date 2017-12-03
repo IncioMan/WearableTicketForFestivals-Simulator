@@ -20,7 +20,7 @@ public class UpdateMessage extends Message{
 
     @Override
     public void process() {
-        receiver.storeUpdateMessage(this);
+        //receiver.storeUpdateMessage(this);
         for (int dbKey: recentLocations.keySet()) {
             if(dbKey == receiver.getPerson().getId()) continue; //Dont update my own position
             DatabaseEntry entry = recentLocations.get(dbKey);
