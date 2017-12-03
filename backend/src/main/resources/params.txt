@@ -4,6 +4,6 @@ R 350 0.00 9.3 5.9
 # CPU cpuCurrentSleep_mA, cpuCurrentRun_mA, cpuCurrentBroadcastAvg_mA, cpuCurrentConnectedAvg_mA, timerCpDelay, timerFDelay, timerLedDelay, timerRDelay, timerUpDelay
 # http://www.ti.com/product/CC2640R2F/datasheet
 # running 48MHz
-C 0.00011 0.3 0.037 0.354 3000 500 8000 100 2000
+C 0.00011 0.3 0.037 0.354 3000 500 8000 100 2000 500
 # running 24MHz and only broadcasting every 20s
 # C 0.00011 0.15 0.0185 0.354 20000 500 8000 100 1000

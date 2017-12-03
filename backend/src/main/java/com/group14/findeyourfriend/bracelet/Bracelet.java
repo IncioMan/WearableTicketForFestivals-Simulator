@@ -60,6 +60,9 @@ public class Bracelet {
 
 	protected double visualFeedBackCurrent_mA;
 	protected double visualFeedBackOnTime;
+	private Position event;
+	private boolean _timerMoveToEventRun;
+	private int secondsAtEvent;
 
 	public Bracelet(Battery b, Radio r, CPU c, Person person) {
 		battery = b;
@@ -98,6 +101,25 @@ public class Bracelet {
 
 	protected void LedState() {
 		switch (stateMachine.getLastCommand()) {
+		case TimerEvent:
+			if (person.getPosition().DistanceTo(event) > _proximity) {
+				// Update LEDS
+				person.GoTowards(event);
+				DebugLog.log(person.getId() + " not arrived to the event " + event.getCoordinates() + " yet");
+			} else {
+				if (secondsAtEvent > 100) {
+					_timerMoveToEventRun = false;
+					event = null;
+					secondsAtEvent = 0;
+					// Turn off LEDs
+					_timerLedRun = false;
+					person.setSpeed(Vector2.getRandomVector());
+				} else {
+					DebugLog.log(person.getId() + " has arrived to the event " + event.getCoordinates());
+					secondsAtEvent++;
+					person.setSpeed(Vector2.Zero); // Stop when found!
+				}
+			}
 		case TimerF:
 			if (_lookForPerson != null && !IsFound()) {
 				synchronized (_dbLock) {
@@ -105,7 +127,6 @@ public class Bracelet {
 						DatabaseEntry dbEntry = dataBase.get(_lookForPerson.getId());
 						if (person.getPosition().DistanceTo(dbEntry.getPosition()) > _proximity) {
 							battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);// Decrement battery from CPU
-																							// time
 							person.GoTowards(dbEntry.getPosition());
 							setFound(false);
 							setGuiding(true);
@@ -142,10 +163,16 @@ public class Bracelet {
 		case FriendFound: // When friend was found in the database.
 			// Start guiding??
 			DebugLog.log(person.getId() + " started looking for " + _lookForPerson.getId());
+			_timerMoveToEventRun = false; // stop going to event
 			_timerFRun = true;
 			_timerLedRun = true;
 			setFound(false);
 			setGuiding(true);
+			break;
+		case GoToEvent:
+			DebugLog.log(person.getId() + " moving towards event " + event.getCoordinates());
+			_timerMoveToEventRun = true;
+			_timerLedRun = true;
 			break;
 		}
 		stateMachine.MoveNext(Command.Sleep);
@@ -319,6 +346,15 @@ public class Bracelet {
 		}
 	}
 
+	public void takeMeToEvent(Position event) {
+		synchronized (_stateLock) {
+			DebugLog.log(this.person.getId() + ": started guiding to event " + event);
+			this.event = event;
+			stateMachine.MoveNext(Command.GoToEvent);
+			RunBracelet();
+		}
+	}
+
 	public final boolean IsFound() {
 		return found;
 	}
@@ -400,6 +436,10 @@ public class Bracelet {
 			// Goto
 			OnTimerF();
 		}
+		if (clock % cpu.timerMoveToEventDelay == 0 && _timerMoveToEventRun) {
+			// Goto
+			OnTimerMoveToEvent();
+		}
 		if (clock % cpu.timerRCPDelay == 0 && _timerRCPRun) {
 			//
 			OnTimerRCP();
@@ -416,6 +456,16 @@ public class Bracelet {
 			ArrayList<XYChart.Data> dataPoints = Chart.DataPointsMap.getOrDefault(person.getId(), new ArrayList<>());
 			dataPoints.add(new XYChart.Data(clock / 60000, battery.getEnergyLeft())); // every "minute" new datapoint
 			Chart.DataPointsMap.putIfAbsent(person.getId(), dataPoints);
+		}
+	}
+
+	private void OnTimerMoveToEvent() {
+		if (stateMachine.getCurrentState() == ProcessState.SLEEP_STATE) {
+			DebugLog.logTimer(person.getId() + ": OnTimerMoveToEvent");
+			if (event != null) {
+				stateMachine.MoveNext(Command.TimerEvent); // Go to change LEDS
+				RunBracelet();
+			}
 		}
 	}
 

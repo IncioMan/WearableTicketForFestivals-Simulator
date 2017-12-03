@@ -111,7 +111,7 @@ public class Simulation {
 				// stopWatch.stop();
 				// System.out.println(stopWatch.getTime());
 			}
-			if (Clock.getClock() % 50 == 0) {
+			if (Clock.getClock() % 100 == 0) {
 				try {
 					Thread.sleep(1);
 				} catch (InterruptedException e1) {
@@ -138,11 +138,7 @@ public class Simulation {
 					new Position(ThreadLocalRandom.current().nextInt(Constants.MIN_WIDTH, Constants.MAX_WIDTH),
 							ThreadLocalRandom.current().nextInt(Constants.MIN_HEIGHT, Constants.MAX_HEIGHT)));
 
-			int randomX = ThreadLocalRandom.current().nextInt(-50, 50 + 10);
-			int randomY = ThreadLocalRandom.current().nextInt(-50, 5 + 10);
-			float x = (float) randomX / 10;
-			float y = (float) randomY / 10;
-			guest.setSpeed(Vector2.Normalize(new Vector2(x, y)));
+			guest.setSpeed(Vector2.getRandomVector());
 			DebugLog.log("ArrivalEvent: guest " + guest.getId() + " arrived");
 			guests.put(guest.getId(), guest);
 		}

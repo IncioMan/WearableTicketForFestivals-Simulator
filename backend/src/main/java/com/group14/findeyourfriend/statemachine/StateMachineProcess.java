@@ -41,12 +41,15 @@ public class StateMachineProcess {
 
 		@Override
 		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 
 			StateTransition that = (StateTransition) o;
 
-			if (_currentState != that._currentState) return false;
+			if (_currentState != that._currentState)
+				return false;
 			return _command == that._command;
 		}
 
@@ -59,30 +62,45 @@ public class StateMachineProcess {
 	}
 
 	/**
-	 * Constructor where we set up the statetransitions based on currentstate, command -> next state
+	 * Constructor where we set up the statetransitions based on currentstate,
+	 * command -> next state
 	 */
 	public StateMachineProcess() {
 		setCurrentState(ProcessState.SLEEP_STATE);
 		_transitions = new HashMap<StateTransition, ProcessState>();
-		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.TimerCp), ProcessState.COMMUNICATION_STATE);
+		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.TimerCp),
+				ProcessState.COMMUNICATION_STATE);
 		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.TimerLed), ProcessState.LED_STATE);
-		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
-		_transitions.put(new StateTransition(ProcessState.COMMUNICATION_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
+		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.StartSearch),
+				ProcessState.S_LOOKUP_STATE);
+		_transitions.put(new StateTransition(ProcessState.COMMUNICATION_STATE, Command.StartSearch),
+				ProcessState.S_LOOKUP_STATE);
 		_transitions.put(new StateTransition(ProcessState.LED_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
-		_transitions.put(new StateTransition(ProcessState.UPDATE_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
+		_transitions.put(new StateTransition(ProcessState.UPDATE_STATE, Command.StartSearch),
+				ProcessState.S_LOOKUP_STATE);
 		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.TimerF), ProcessState.LED_STATE);
 		_transitions.put(new StateTransition(ProcessState.LED_STATE, Command.Sleep), ProcessState.SLEEP_STATE);
-		_transitions.put(new StateTransition(ProcessState.S_LOOKUP_STATE, Command.FriendNotFound), ProcessState.SLEEP_STATE);
+		_transitions.put(new StateTransition(ProcessState.S_LOOKUP_STATE, Command.FriendNotFound),
+				ProcessState.SLEEP_STATE);
 		_transitions.put(new StateTransition(ProcessState.S_LOOKUP_STATE, Command.FriendFound), ProcessState.LED_STATE);
-		_transitions.put(new StateTransition(ProcessState.COMMUNICATION_STATE, Command.TimerUp), ProcessState.UPDATE_STATE);
+		_transitions.put(new StateTransition(ProcessState.COMMUNICATION_STATE, Command.TimerUp),
+				ProcessState.UPDATE_STATE);
 		_transitions.put(new StateTransition(ProcessState.UPDATE_STATE, Command.Sleep), ProcessState.SLEEP_STATE);
+		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.GoToEvent), ProcessState.LED_STATE);
+		_transitions.put(new StateTransition(ProcessState.COMMUNICATION_STATE, Command.GoToEvent),
+				ProcessState.LED_STATE);
+		_transitions.put(new StateTransition(ProcessState.LED_STATE, Command.GoToEvent), ProcessState.LED_STATE);
+		_transitions.put(new StateTransition(ProcessState.UPDATE_STATE, Command.GoToEvent), ProcessState.LED_STATE);
+		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.TimerEvent), ProcessState.LED_STATE);
 	}
 
 	public final ProcessState GetNext(Command command) {
 		StateTransition transition = new StateTransition(getCurrentState(), command);
 		ProcessState nextState = _transitions.get(transition);
-		if (nextState != null) return nextState;
-		else throw new RuntimeException("Invalid transition: " + getCurrentState() + " -> " + command);
+		if (nextState != null)
+			return nextState;
+		else
+			throw new RuntimeException("Invalid transition: " + getCurrentState() + " -> " + command);
 	}
 
 	public final ProcessState MoveNext(Command command) {

@@ -16,7 +16,7 @@ public class ConcertEvent extends Event {
 			if (guestsToConcert.contains(g.getId() + "")) {
 				Position position = new Position(concertLocation.getCoordinates().getX(),
 						concertLocation.getCoordinates().getY());
-				g.GoTowards(position);
+				g.getBracelet().takeMeToEvent(position);
 			}
 		});
 	}

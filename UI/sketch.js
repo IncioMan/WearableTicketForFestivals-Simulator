@@ -14,11 +14,11 @@ class Concert{
   }
 
   show(){
-      // if(this.logo != null){
-//        image(this.logo, this.X, this.Y, 100, 100);
-//       }else{
+//      if(this.logo != null){
+//        image(this.logo, this.X-50, this.Y-100, 100, 100);
+//      }else{
          fill('#9E9E9E');
-         rect(this.X, this.Y, 100, 50);
+         rect(this.X-50, this.Y-100, 100, 50);
 //       }
   }
 }
