@@ -1,6 +1,7 @@
 package com.group14.common_interface;
 
 import java.io.Serializable;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Vector2 implements Serializable {
 	/**
@@ -95,6 +96,14 @@ public class Vector2 implements Serializable {
 	@Override
 	public String toString() {
 		return "Vector[" + x + ", " + y + "]";
+	}
+
+	public static Vector2 getRandomVector() {
+		int randomX = ThreadLocalRandom.current().nextInt(-50, 50 + 10);
+		int randomY = ThreadLocalRandom.current().nextInt(-50, 5 + 10);
+		float x = (float) randomX / 10;
+		float y = (float) randomY / 10;
+		return Vector2.Normalize(new Vector2(x, y));
 	}
 
 }
