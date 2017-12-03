@@ -8,23 +8,28 @@ import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
-import com.group14.findeyourfriend.bracelet.*;
-import com.group14.findeyourfriend.message.Broker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.group14.common_interface.Position;
 import com.group14.common_interface.Vector2;
+import com.group14.findeyourfriend.Clock;
 import com.group14.findeyourfriend.Constants;
 import com.group14.findeyourfriend.Notifier;
 import com.group14.findeyourfriend.Parameters;
+import com.group14.findeyourfriend.bracelet.Battery;
+import com.group14.findeyourfriend.bracelet.Bracelet;
+import com.group14.findeyourfriend.bracelet.CPU;
+import com.group14.findeyourfriend.bracelet.Person;
+import com.group14.findeyourfriend.bracelet.Radio;
+import com.group14.findeyourfriend.bracelet.SRBracelet;
 import com.group14.findeyourfriend.debug.DebugLog;
+import com.group14.findeyourfriend.message.Broker;
 import com.group14.findeyourfriend.simulation.events.ConcertEvent;
 import com.group14.findeyourfriend.simulation.events.Event;
 
 @Component
 public class Simulation {
-	private int clock;
 	private java.util.Map<Integer, Person> guests;
 	private HashMap<Integer, ArrayList<Event>> timeEvents;
 	private Map map;
@@ -37,15 +42,16 @@ public class Simulation {
 	@Autowired
 	private Notifier notifier;
 	private List<Consumer<Collection<Person>>> guestsConsumers;
-    private boolean SRSimulation;
+	private boolean SRSimulation;
 
-    public Simulation() {
+	public Simulation() {
 		guestsConsumers = new ArrayList<>();
 	}
 
-	public void init(Queue<Event> events, boolean SRSimulation, int simulationTime) {// notifier = new Notifier("producer",
-																// IConstants.QUEUE_NAME);
-		clock = 0;
+	public void init(Queue<Event> events, boolean SRSimulation, int simulationTime) {// notifier = new
+																						// Notifier("producer",
+		// IConstants.QUEUE_NAME);
+		Clock.resetClock();
 		timeEvents = new HashMap<>();
 		List<ConcertEvent> concertEvents = new ArrayList<>();
 
@@ -79,40 +85,53 @@ public class Simulation {
 		battery = new Battery(225); // Coincell battery
 		// radio = new Radio(1000, 0.01, 7.0, 5);
 
-		while (clock <= simulationTime) {
-			ArrayList<Event> events = timeEvents.getOrDefault(clock, new ArrayList<>());
+		while (Clock.getClock() <= simulationTime) {
+			ArrayList<Event> events = timeEvents.getOrDefault(Clock.getClock().intValue(), new ArrayList<>());
 			for (Event e : events) {
 				e.process();
+				notifier.addEvent(e);
 			}
 			for (Person person : guests.values())
-				person.getBracelet().transition(clock);
+				person.getBracelet().transition(Clock.getClock().intValue());
 
-			if (clock % 500 == 0) {
+			if (Clock.getClock() % 500 == 0) {
 				for (Person person : guests.values())
 					person.UpdatePosition();
 				if (notifier != null) {
 					notifier.notify(guests.values());
 				}
 			}
-			if (clock % 10 == 0) {
+
+			if (Clock.getClock() % 10 == 0) {
+				// StopWatch stopWatch = new StopWatch();
+				// stopWatch.start();
 				guestsConsumers.forEach(c -> {
 					c.accept(guests.values());
 				});
-
+				// stopWatch.stop();
+				// System.out.println(stopWatch.getTime());
 			}
-			clock++;
+			if (Clock.getClock() % 50 == 0) {
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+			Clock.incrementClock();
 		}
 		DebugLog.log("All events processed or simulation time has run out. Simulation finished.");
 	}
 
 	public void newGuestsArrived(List<Person> newGuests) {
-        for (Person guest : newGuests) {
-            Bracelet bracelet;
-            if(SRSimulation)
-                bracelet = new SRBracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest);
-            else
-                bracelet = new Bracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest);
-            bracelet.Subscribe(broker);
+		for (Person guest : newGuests) {
+			Bracelet bracelet;
+			if (SRSimulation)
+				bracelet = new SRBracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest);
+			else
+				bracelet = new Bracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest);
+			bracelet.Subscribe(broker);
 			guest.setBracelet(bracelet);
 
 			guest.setPosition(

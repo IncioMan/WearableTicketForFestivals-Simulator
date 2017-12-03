@@ -14,12 +14,12 @@ class Concert{
   }
 
   show(){
-      if(this.logo != null){
-        image(this.logo, this.X, this.Y, 100, 100);
-      }else{
-        fill('#9E9E9E');
-        rect(this.X, this.Y, 100, 50);
-      }
+      // if(this.logo != null){
+//        image(this.logo, this.X, this.Y, 100, 100);
+//       }else{
+         fill('#9E9E9E');
+         rect(this.X, this.Y, 100, 50);
+//       }
   }
 }
 
@@ -68,7 +68,7 @@ class Person{
 }
 
 function setup() {
-  var canvas = createCanvas(1200, 800);
+  var canvas = createCanvas(1000, 500);
   //guests.push(new Person(0,100,100, true));
   // Move the canvas so it's inside our <div id="sketch-holder">.
   canvas.parent('sketch-holder');
@@ -99,11 +99,11 @@ function mousePressed(){
 window.setInterval(function(){
   var url = 'http://localhost:8080/guests'
   loadJSON(url, drawGuests);
-  if(concerts == null){
+  if(concerts.length == 0){
     var url = 'http://localhost:8080/concerts'
     loadJSON(url, drawConcerts);
   }
-}, 300);
+}, 100);
 
 function drawGuests(people) {
   guests = [];

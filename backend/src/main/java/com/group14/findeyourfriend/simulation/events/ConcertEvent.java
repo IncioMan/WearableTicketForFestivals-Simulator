@@ -14,7 +14,9 @@ public class ConcertEvent extends Event {
 	public void process() {
 		sim.getGuests().forEach(g -> {
 			if (guestsToConcert.contains(g.getId() + "")) {
-				g.MoveTo(concertLocation);
+				Position position = new Position(concertLocation.getCoordinates().getX(),
+						concertLocation.getCoordinates().getY());
+				g.GoTowards(position);
 			}
 		});
 	}
@@ -40,6 +42,19 @@ public class ConcertEvent extends Event {
 
 	public Set<String> getGuestsToConcert() {
 		return guestsToConcert;
+	}
+
+	@Override
+	public String getDescription() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Concert Event - Location: " + getConcertLocation().getCoordinates().getX() + ","
+				+ getConcertLocation().getCoordinates().getY() + " - ");
+		builder.append("People attending: ");
+		guestsToConcert.forEach(p -> {
+			builder.append(p + ", ");
+		});
+
+		return builder.toString();
 	}
 
 }

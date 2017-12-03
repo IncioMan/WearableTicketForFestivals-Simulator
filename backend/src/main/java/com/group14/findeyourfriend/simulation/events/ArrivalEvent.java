@@ -20,4 +20,15 @@ public class ArrivalEvent extends Event {
 	public List<Person> getPeopleComing() {
 		return peopleComing;
 	}
+
+	@Override
+	public String getDescription() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Arrival Event - People arrived: ");
+		peopleComing.forEach(p -> {
+			builder.append(p.getId() + ", ");
+		});
+
+		return builder.toString();
+	}
 }

@@ -7,9 +7,9 @@ public class SearchEvent extends Event {
 
 	int end;
 	private String hunterName;
-	private int hunterId;
+	// private int hunterId;
 	private String preyName;
-	private int preyId;
+	// private int preyId;
 
 	@Override
 	public void process() {
@@ -17,8 +17,8 @@ public class SearchEvent extends Event {
 			if (h.getName().equals(hunterName)) {
 				for (Person p : sim.getGuests()) {
 					if (p.getName().equals(preyName)) {
-						DebugLog.log("SearchEvent: " + h.toString() + " searching for " + p.toString());
 						h.getBracelet().StartSearch(p);
+						DebugLog.log("SearchTimer: " + h.toString() + " searching for " + p.toString());
 					}
 				}
 			}
@@ -46,18 +46,6 @@ public class SearchEvent extends Event {
 		this.preyName = pName;
 	}
 
-	public void setHunterId(int hunterId) {
-		this.hunterId = hunterId;
-	}
-
-	public void setPreyId(int preyId) {
-		this.preyId = preyId;
-	}
-
-	public int getHunterId() {
-		return hunterId;
-	}
-
 	@Override
 	public int getStart() {
 		return super.getStart();
@@ -71,11 +59,14 @@ public class SearchEvent extends Event {
 		return end;
 	}
 
-	public int getPreyId() {
-		return preyId;
-	}
-
 	public String getPreyName() {
 		return preyName;
+	}
+
+	@Override
+	public String getDescription() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Search Event - " + hunterName + " searching " + preyName);
+		return builder.toString();
 	}
 }

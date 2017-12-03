@@ -1,12 +1,11 @@
 package com.group14.findeyourfriend.bracelet;
+
 import com.group14.common_interface.Position;
 //========================================================================
 
-
-
 //========================================================================
 public class DatabaseEntry {
-	public DatabaseEntry(){
+	public DatabaseEntry() {
 		this.timeStamp = 0L;
 		this.Position = null;
 	}

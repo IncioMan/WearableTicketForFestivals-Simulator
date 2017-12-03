@@ -10,9 +10,9 @@ package com.group14.findeyourfriend;
 public final class Constants {
 
 	/// #region Map
-	public static final int MAX_WIDTH = 1200;
+	public static final int MAX_WIDTH = 1000;
 	public static final int MIN_WIDTH = 0;
 	public static final int MIN_HEIGHT = 0;
-	public static final int MAX_HEIGHT = 600;
+	public static final int MAX_HEIGHT = 500;
 	/// #endregion
 }

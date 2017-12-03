@@ -8,6 +8,8 @@ public abstract class Event {
 
 	public abstract void process();
 
+	public abstract String getDescription();
+
 	public void setSimulation(Simulation simulation) {
 		this.sim = simulation;
 	}

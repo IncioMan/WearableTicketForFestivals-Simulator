@@ -50,7 +50,7 @@ public class StatisticsCalculatorTest {
 		calculator.setTimeThreshold(30);
 		calculator.setGetCurrentTime(() -> 0l);
 		calculator.calculate(people);
-		Assert.assertEquals(40l, calculator.getTotalAverageAgeInDatabase(), 0);
+		Assert.assertEquals(40d, calculator.getTotalAverageAgeInDatabase(), 0);
 		Assert.assertEquals(40l, calculator.getCurrentAverageAgeInDatabase(), 0);
 		Assert.assertEquals(100, calculator.getCurrentPercentagePeopleInDatabase(), 0);
 		Assert.assertEquals(100, calculator.getTotalPercentagePeopleInDatabase(), 0);

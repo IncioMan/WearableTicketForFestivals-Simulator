@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import com.group14.findeyourfriend.Clock;
 import com.group14.findeyourfriend.bracelet.Bracelet;
 import com.group14.findeyourfriend.bracelet.DatabaseEntry;
 import com.group14.findeyourfriend.bracelet.Person;
@@ -46,29 +47,26 @@ public class StatisticsCalculator {
 		currentAverageAgeInDatabase = Pair.of(0d, 0);
 		currentPercentagePeopleInDatabase = Pair.of(0d, 0);
 		currentPercentageRecentLocationsInDatabase = Pair.of(0d, 0);
-		getCurrentTime = () -> System.currentTimeMillis();
+		getCurrentTime = () -> Clock.getClock();
 	}
 
 	public void calculate(Collection<Person> guests) {
-		new Thread(() -> {
-			currentAverageAgeInDatabase = calculateAvgAgeLocationsDB(guests, getCurrentTime.get());
-			totalAverageAgeInDatabase = Pair
-					.of(totalAverageAgeInDatabase.getLeft() + currentAverageAgeInDatabase.getLeft()//
-			, totalAverageAgeInDatabase.getRight() + currentAverageAgeInDatabase.getRight());
-			//
-			currentPercentagePeopleInDatabase = calculatePercentagePeopleInDatabase(guests);
-			totalPercentagePeopleInDatabase = Pair
-					.of(totalPercentagePeopleInDatabase.getLeft() + currentPercentagePeopleInDatabase.getLeft()//
-			, totalPercentagePeopleInDatabase.getRight() + currentPercentagePeopleInDatabase.getRight());
-			//
-			currentPercentageRecentLocationsInDatabase = calculatePercentageRecentLocationsInDatabase(guests,
-					getCurrentTime.get(), getTimeThreshold());
-			totalPercentageRecentLocationsInDatabase = Pair.of(totalPercentageRecentLocationsInDatabase.getLeft()
-					+ currentPercentageRecentLocationsInDatabase.getLeft()//
-			, totalPercentageRecentLocationsInDatabase.getRight()
-					+ currentPercentageRecentLocationsInDatabase.getRight());
-			percentagePeopleOutOfRange = calculatePercentagePeopleOutOfRange(guests);
-		}).start();
+		currentAverageAgeInDatabase = calculateAvgAgeLocationsDB(guests, getCurrentTime.get());
+		totalAverageAgeInDatabase = Pair.of(totalAverageAgeInDatabase.getLeft() + currentAverageAgeInDatabase.getLeft()//
+				, totalAverageAgeInDatabase.getRight() + currentAverageAgeInDatabase.getRight());
+		//
+		currentPercentagePeopleInDatabase = calculatePercentagePeopleInDatabase(guests);
+		totalPercentagePeopleInDatabase = Pair
+				.of(totalPercentagePeopleInDatabase.getLeft() + currentPercentagePeopleInDatabase.getLeft()//
+						, totalPercentagePeopleInDatabase.getRight() + currentPercentagePeopleInDatabase.getRight());
+		//
+		currentPercentageRecentLocationsInDatabase = calculatePercentageRecentLocationsInDatabase(guests,
+				getCurrentTime.get(), getTimeThreshold());
+		totalPercentageRecentLocationsInDatabase = Pair.of(totalPercentageRecentLocationsInDatabase.getLeft()
+				+ currentPercentageRecentLocationsInDatabase.getLeft()//
+				, totalPercentageRecentLocationsInDatabase.getRight()
+						+ currentPercentageRecentLocationsInDatabase.getRight());
+		percentagePeopleOutOfRange = calculatePercentagePeopleOutOfRange(guests);
 		// System.out.println("Current average age in DB: " +
 		// getCurrentAverageAgeInDatabase() / 1000 + " s");
 		// System.out.println("Total average age in DB: " +
@@ -155,7 +153,7 @@ public class StatisticsCalculator {
 			return 0d;
 		}
 		return new BigDecimal(totalAverageAgeInDatabase.getLeft() / totalAverageAgeInDatabase.getRight())
-				.divide(new BigDecimal(1000))// return seconds
+				// .divide(new BigDecimal(1000))// return seconds
 				.setScale(2, RoundingMode.HALF_UP).doubleValue();
 	}
 
@@ -166,7 +164,7 @@ public class StatisticsCalculator {
 			return 0d;
 		}
 		return new BigDecimal(currentAverageAgeInDatabase.getLeft() / currentAverageAgeInDatabase.getRight())
-				.divide(new BigDecimal(1000))// return seconds
+				// .divide(new BigDecimal(1000))// return seconds
 				.setScale(2, RoundingMode.HALF_UP).doubleValue();
 	}
 

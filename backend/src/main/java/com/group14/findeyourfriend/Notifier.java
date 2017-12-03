@@ -2,7 +2,9 @@ package com.group14.findeyourfriend;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.group14.common_interface.PersonDto;
 import com.group14.findeyourfriend.bracelet.Person;
 import com.group14.findeyourfriend.simulation.events.ConcertEvent;
+import com.group14.findeyourfriend.simulation.events.Event;
 
 @RestController
 public class Notifier {
@@ -18,10 +21,12 @@ public class Notifier {
 	private DtoConverter converter;
 	private List<PersonDto> guests;
 	private List<ConcertEvent> concertEvents;
+	private Queue<Event> events;
 
 	public Notifier() {
 		converter = new DtoConverter();
 		guests = new ArrayList<>();
+		events = new LinkedList<>();
 	}
 
 	public void notify(Collection<Person> values) {
@@ -35,6 +40,10 @@ public class Notifier {
 		});
 
 		guests = dtos;
+	}
+
+	public void addEvent(Event event) {
+		events.add(event);
 	}
 
 	@RequestMapping("/guests")
@@ -56,6 +65,16 @@ public class Notifier {
 	@CrossOrigin
 	public List<ConcertEvent> getConcertEvents() {
 		return concertEvents;
+	}
+
+	@RequestMapping("/event")
+	@CrossOrigin
+	public String getEvent() {
+		Event event = events.poll();
+		if (event != null) {
+			return "{\n\"description\":\"" + event.getDescription() + "\"\n}";
+		}
+		return "";
 	}
 	// private MessageProducer messageProducer;
 	// private DtoConverter converter;

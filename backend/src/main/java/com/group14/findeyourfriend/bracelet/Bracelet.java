@@ -1,12 +1,14 @@
 package com.group14.findeyourfriend.bracelet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.group14.common_interface.Position;
 import com.group14.common_interface.Vector2;
-import com.group14.findeyourfriend.message.Broker;
+import com.group14.findeyourfriend.Clock;
 import com.group14.findeyourfriend.chart.Chart;
 import com.group14.findeyourfriend.debug.DebugLog;
+import com.group14.findeyourfriend.message.Broker;
 import com.group14.findeyourfriend.message.Message;
 import com.group14.findeyourfriend.message.UpdateMessage;
 import com.group14.findeyourfriend.statemachine.Command;
@@ -18,21 +20,21 @@ import javafx.scene.chart.XYChart;
 public class Bracelet {
 	private boolean guiding;
 	private boolean found;
-	//private final StateMachineProcess stateMachine = new StateMachineProcess();
-//	private boolean _timerFRun;
-//	private boolean _timerLedRun;
-//	private boolean _timerRCPRun;
-//	private boolean _timerUpRun;
-//	private Broker _broker;
-	//private final HashMap<Integer, DatabaseEntry> dataBase = new HashMap<>();
-//	private HashMap<Integer, HashSet<Long>> receivedMessages = new HashMap<>();
+	// private final StateMachineProcess stateMachine = new StateMachineProcess();
+	// private boolean _timerFRun;
+	// private boolean _timerLedRun;
+	// private boolean _timerRCPRun;
+	// private boolean _timerUpRun;
+	// private Broker _broker;
+	// private final HashMap<Integer, DatabaseEntry> dataBase = new HashMap<>();
+	// private HashMap<Integer, HashSet<Long>> receivedMessages = new HashMap<>();
 
 	protected Battery battery;
 	protected Radio radio;
 	protected CPU cpu;
 	// TODO implement screen
 
-    protected Person person;
+	protected Person person;
 	protected Person _lookForPerson;
 
 	protected StateMachineProcess stateMachine;
@@ -44,7 +46,7 @@ public class Bracelet {
 
 	protected Broker _broker;
 
-    protected ArrayList<Message> updateMessagesToRelay = new ArrayList<>();
+	protected ArrayList<Message> updateMessagesToRelay = new ArrayList<>();
 
 	protected final HashMap<Integer, DatabaseEntry> dataBase = new HashMap<>();
 
@@ -153,12 +155,12 @@ public class Bracelet {
 		_timerRCPRun = true;
 		_timerUpRun = true;
 
-        CreateUpdateMessage();
-        BroadcastMessages(updateMessagesToRelay);
+		CreateUpdateMessage();
+		BroadcastMessages(updateMessagesToRelay);
 
 		battery.DecrementEnergy(cpu.cpuCurrentBroadcastAvg_mA, cpu.timerUpDelay);// Decrement battery from CPU for the
 																					// entire CreateUpdateMessage
-        // TODO decrement more energy for the relay?
+		// TODO decrement more energy for the relay?
 		// radio.setState(RadioState.Transmitting);
 		// battery.DecrementEnergy(radio.getConsumption(), broadcastTime);// Decrement
 		// from radio for single CreateUpdateMessage
@@ -179,9 +181,9 @@ public class Bracelet {
 		synchronized (_dbLock) {
 			DebugLog.log(person.getId() + ": Looking up location in my DB");
 			if (_lookForPerson != null) {
-                battery.DecrementEnergy(cpu.cpuCurrentRun_mA, 1000);
+				battery.DecrementEnergy(cpu.cpuCurrentRun_mA, 1000);
 				if (dataBase.containsKey(_lookForPerson.getId())) {
-				    // TODO implement if(!recentEnough) then it is not found
+					// TODO implement if(!recentEnough) then it is not found
 					setGuiding(true);
 					setFound(false);
 					stateMachine.MoveNext(Command.FriendFound);
@@ -198,7 +200,7 @@ public class Bracelet {
 	/**
 	 * Method run once the bracelet should go into communication phase
 	 */
-    protected void OnTimerCp() {
+	protected void OnTimerCp() {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.SLEEP_STATE) {
 				DebugLog.logTimer(person.getId() + ": OnTimerCp");
@@ -211,7 +213,7 @@ public class Bracelet {
 	/**
 	 * Method run once the isFound timer is elapsed
 	 */
-    protected void OnTimerF() {
+	protected void OnTimerF() {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.SLEEP_STATE) {
 				DebugLog.logTimer(person.getId() + ": OnTimerF");
@@ -226,7 +228,7 @@ public class Bracelet {
 	/**
 	 * Method run once the LedTimer is elapsed
 	 */
-    protected void OnTimerLed() {
+	protected void OnTimerLed() {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.SLEEP_STATE) {
 				DebugLog.logTimer(person.getId() + ": OnTimerLed");
@@ -242,7 +244,7 @@ public class Bracelet {
 	 * Method run once the Rebroadcast timer is elapsed
 	 *
 	 */
-    protected void OnTimerRCP() {
+	protected void OnTimerRCP() {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.COMMUNICATION_STATE) {
 				DebugLog.logTimer(person.getId() + ": Rebroadcast");
@@ -259,14 +261,14 @@ public class Bracelet {
 	/**
 	 * Method run once the Update database timer is elapsed
 	 */
-    protected void OnTimerUp() {
-        _timerRCPRun = false;
-        _timerUpRun = false;
+	protected void OnTimerUp() {
+		_timerRCPRun = false;
+		_timerUpRun = false;
 		// _timerUp.cancel(); // Stop the timer from happening when not usefull
 		// _timerR.cancel(); // Stop the rebroadcast timer
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.COMMUNICATION_STATE) {
-                updateMessagesToRelay = new ArrayList<>();
+				updateMessagesToRelay = new ArrayList<>();
 				DebugLog.logTimer(person.getId() + ": OnTimerUp");
 				stateMachine.MoveNext(Command.TimerUp);
 				RunBracelet();
@@ -284,24 +286,27 @@ public class Bracelet {
 	 *
 	 */
 	public final void HandleBroadcast(Message msg) {
-//		if (senderID == this.person.getId()) {
-//			return;
-//		}
-//		HashSet<Long> senderMessageIds = receivedMessages.getOrDefault(senderId, new HashSet<>());
-//		if(senderMessageIds.contains(messageId)) return; // Only handle received message once
-//        receivedMessages.put(senderId, senderMessageIds);// Add to received messages
+		// if (senderID == this.person.getId()) {
+		// return;
+		// }
+		// HashSet<Long> senderMessageIds = receivedMessages.getOrDefault(senderId, new
+		// HashSet<>());
+		// if(senderMessageIds.contains(messageId)) return; // Only handle received
+		// message once
+		// receivedMessages.put(senderId, senderMessageIds);// Add to received messages
 
-			synchronized (_dbLock) // Thread safety locking
-			{
-				msg.process();
-	//		    for (int dbKey: senderDataBase.keySet()) {
-	//                if(dbKey == person.getId()) continue; //Dont update my own position
-	//                DatabaseEntry entry = senderDataBase.get(dbKey);
-	//                if(entry.getTimeStamp() > dataBase.getOrDefault(dbKey, new DatabaseEntry()).getTimeStamp()) dataBase.put(dbKey, entry); // update or overwrite
-	//            }
-	//			DebugLog.logTimer(person.getId() + ": HEARD IT FROM " + senderId);
-			}
-
+		synchronized (_dbLock) // Thread safety locking
+		{
+			msg.process();
+			// for (int dbKey: senderDataBase.keySet()) {
+			// if(dbKey == person.getId()) continue; //Dont update my own position
+			// DatabaseEntry entry = senderDataBase.get(dbKey);
+			// if(entry.getTimeStamp() > dataBase.getOrDefault(dbKey, new
+			// DatabaseEntry()).getTimeStamp()) dataBase.put(dbKey, entry); // update or
+			// overwrite
+			// }
+			// DebugLog.logTimer(person.getId() + ": HEARD IT FROM " + senderId);
+		}
 
 	}
 
@@ -346,42 +351,44 @@ public class Bracelet {
 		return stateMachine;
 	}
 
-    // HashMap <Int, HashSet> for received messages
+	// HashMap <Int, HashSet> for received messages
 	// HashSet <Long> for myMessages
-    // every message has a long ID which is the timestamp
-    // add messageID to myMessages with current timestamp
-    // put myMessages in receivedMessages
-    // create a DBentry with my position, put it in the db
-    // CreateUpdateMessage (ID, position, range, messageID, db)
+	// every message has a long ID which is the timestamp
+	// add messageID to myMessages with current timestamp
+	// put myMessages in receivedMessages
+	// create a DBentry with my position, put it in the db
+	// CreateUpdateMessage (ID, position, range, messageID, db)
 
-    //
-	private void CreateUpdateMessage(){
-        DatabaseEntry dbE = new DatabaseEntry();
-        dbE.setPosition(getPosition());
-        dbE.setTimeStamp(System.currentTimeMillis());
-        dataBase.put(person.getId(), dbE);
-	    UpdateMessage updateMessage = new UpdateMessage(this, dataBase);
-	    //storeUpdateMessage(updateMessage);
-        _broker.DoBroadcast(this, getPosition(), radio.getRange_M(), updateMessage);
+	//
+	private void CreateUpdateMessage() {
+		DatabaseEntry dbE = new DatabaseEntry();
+		dbE.setPosition(getPosition());
+		dbE.setTimeStamp(Clock.getClock());
+		dataBase.put(person.getId(), dbE);
+		UpdateMessage updateMessage = new UpdateMessage(this, dataBase);
+		// storeUpdateMessage(updateMessage);
+		_broker.DoBroadcast(this, getPosition(), radio.getRange_M(), updateMessage);
 
-//	    int myId = person.getId();
-//        HashSet<Long> myMessages = receivedMessages.getOrDefault(myId, new HashSet<>());
-//        long messageId = System.currentTimeMillis();
-//        myMessages.add(messageId);
-//        receivedMessages.put(myId, myMessages);
-//        DatabaseEntry dbE = new DatabaseEntry();
-//        dbE.setPosition(getPosition());
-//        dbE.setTimeStamp(System.currentTimeMillis());
-//        dataBase.put(person.getId(), dbE);
-//        _broker.DoBroadcast(person.getId(), getPosition(), radio.getRange_M(), updateMessage);
-    }
+		// int myId = person.getId();
+		// HashSet<Long> myMessages = receivedMessages.getOrDefault(myId, new
+		// HashSet<>());
+		// long messageId = System.currentTimeMillis();
+		// myMessages.add(messageId);
+		// receivedMessages.put(myId, myMessages);
+		// DatabaseEntry dbE = new DatabaseEntry();
+		// dbE.setPosition(getPosition());
+		// dbE.setTimeStamp(System.currentTimeMillis());
+		// dataBase.put(person.getId(), dbE);
+		// _broker.DoBroadcast(person.getId(), getPosition(), radio.getRange_M(),
+		// updateMessage);
+	}
 
-    protected void BroadcastMessages(ArrayList<Message> messages){
-        for(Message msg : messages){
-        	_broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
+	protected void BroadcastMessages(ArrayList<Message> messages) {
+		for (Message msg : messages) {
+			_broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
 		}
 
-    }
+	}
 
 	public void transition(int clock) {
 
@@ -412,11 +419,11 @@ public class Bracelet {
 		}
 	}
 
-    public Person getPerson() {
-        return person;
-    }
+	public Person getPerson() {
+		return person;
+	}
 
-    public void storeUpdateMessage(UpdateMessage msg) {
-        updateMessagesToRelay.add(msg);
-    }
+	public void storeUpdateMessage(UpdateMessage msg) {
+		updateMessagesToRelay.add(msg);
+	}
 }

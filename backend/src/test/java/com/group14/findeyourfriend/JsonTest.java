@@ -36,8 +36,8 @@ public class JsonTest {
 		ArrivalEvent event2 = mapper.readValue(jsonInString, ArrivalEvent.class);
 
 		SearchEvent searchEvent = new SearchEvent();
-		searchEvent.setHunterId(1);
-		searchEvent.setPreyId(1);
+		searchEvent.setHunterName("");
+		searchEvent.setPreyName("");
 		searchEvent.setHunterName("ciao");
 
 		// Object to JSON in String
