@@ -41,6 +41,7 @@ public class Chart extends Application {
             series.setName("Person: " + id);
             series.getData().addAll(DataPoints);
             seriesArrayList.add(series);
+			lineChart.setCreateSymbols(false);
             lineChart.getData().add(series);
 
         }
