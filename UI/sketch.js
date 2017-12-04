@@ -1,6 +1,6 @@
 var bubbles = [];
-var person_width = 40;
-var person_height = 40;
+var person_width = 20;
+var person_height = 20;
 var guests = [];
 var concerts = [];
 var concertImg;
@@ -17,6 +17,7 @@ class Concert{
 //      if(this.logo != null){
 //        image(this.logo, this.X-50, this.Y-100, 100, 100);
 //      }else{
+         stroke('black');
          fill('#9E9E9E');
          rect(this.X-50, this.Y-100, 100, 50);
 //       }

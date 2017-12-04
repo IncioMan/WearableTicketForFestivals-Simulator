@@ -8,6 +8,7 @@ import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ import com.group14.findeyourfriend.Notifier;
 import com.group14.findeyourfriend.Parameters;
 import com.group14.findeyourfriend.bracelet.Battery;
 import com.group14.findeyourfriend.bracelet.Bracelet;
+import com.group14.findeyourfriend.bracelet.BraceletEvent;
 import com.group14.findeyourfriend.bracelet.CPU;
 import com.group14.findeyourfriend.bracelet.Person;
 import com.group14.findeyourfriend.bracelet.Radio;
@@ -102,7 +104,7 @@ public class Simulation {
 				}
 			}
 
-			if (Clock.getClock() % 10 == 0) {
+			if (Clock.getClock() % 200 == 0) {
 				// StopWatch stopWatch = new StopWatch();
 				// stopWatch.start();
 				guestsConsumers.forEach(c -> {
@@ -110,14 +112,6 @@ public class Simulation {
 				});
 				// stopWatch.stop();
 				// System.out.println(stopWatch.getTime());
-			}
-			if (Clock.getClock() % 100 == 0) {
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 			}
 			Clock.incrementClock();
 		}
@@ -154,6 +148,10 @@ public class Simulation {
 
 	public void add(Consumer<Collection<Person>> consumer) {
 		guestsConsumers.add(consumer);
+	}
+
+	public void addEventListener(Consumer<Pair<Person, BraceletEvent>> consumer) {
+		broker.addEventConsumer(consumer);
 	}
 
 }

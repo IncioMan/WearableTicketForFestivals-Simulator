@@ -44,7 +44,7 @@ public class Bracelet {
 	protected boolean _timerRCPRun;
 	protected boolean _timerUpRun;
 
-	protected Broker _broker;
+	protected Broker broker;
 
 	protected ArrayList<Message> updateMessagesToRelay = new ArrayList<>();
 
@@ -126,7 +126,8 @@ public class Bracelet {
 					if (dataBase.containsKey(_lookForPerson.getId())) {
 						DatabaseEntry dbEntry = dataBase.get(_lookForPerson.getId());
 						if (person.getPosition().DistanceTo(dbEntry.getPosition()) > _proximity) {
-							battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);// Decrement battery from CPU
+							// Decrement battery from CPU
+							battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);
 							person.GoTowards(dbEntry.getPosition());
 							setFound(false);
 							setGuiding(true);
@@ -139,6 +140,7 @@ public class Bracelet {
 							_timerFRun = false;
 							person.setSpeed(Vector2.Zero); // Stop when found!
 							_lookForPerson.setSpeed(Vector2.Zero); // Other person stop
+							broker.notifyEvent(this.getPerson(), BraceletEvent.FRIEND_MET);
 							// Turn off LEDs
 							_timerLedRun = false;
 						}
@@ -166,6 +168,7 @@ public class Bracelet {
 			_timerMoveToEventRun = false; // stop going to event
 			_timerFRun = true;
 			_timerLedRun = true;
+			broker.notifyEvent(this.getPerson(), BraceletEvent.FRIEND_FOUND_IN_DB);
 			setFound(false);
 			setGuiding(true);
 			break;
@@ -173,6 +176,7 @@ public class Bracelet {
 			DebugLog.log(person.getId() + " moving towards event " + event.getCoordinates());
 			_timerMoveToEventRun = true;
 			_timerLedRun = true;
+			_timerFRun = false;
 			break;
 		}
 		stateMachine.MoveNext(Command.Sleep);
@@ -216,6 +220,7 @@ public class Bracelet {
 					stateMachine.MoveNext(Command.FriendFound);
 					DebugLog.log(person.getId() + ": Found person in my DB");
 				} else {
+					broker.notifyEvent(getPerson(), BraceletEvent.FRIEND_NOT_FOUND_IN_DB);
 					stateMachine.MoveNext(Command.FriendNotFound);
 					DebugLog.log(person.getId() + ": Did not find person in my DB");
 				}
@@ -304,8 +309,8 @@ public class Bracelet {
 	}
 
 	public final void Subscribe(Broker broker) {
-		_broker = broker;
-		_broker.AddBracelet(this);
+		this.broker = broker;
+		this.broker.AddBracelet(this);
 	}
 
 	/**
@@ -342,6 +347,7 @@ public class Bracelet {
 			DebugLog.log(this.person.getId() + ": started searching for " + person.getId());
 			_lookForPerson = person;
 			stateMachine.MoveNext(Command.StartSearch);
+			broker.notifyEvent(this.getPerson(), BraceletEvent.START_SEARCH);
 			RunBracelet();
 		}
 	}
@@ -351,6 +357,7 @@ public class Bracelet {
 			DebugLog.log(this.person.getId() + ": started guiding to event " + event);
 			this.event = event;
 			stateMachine.MoveNext(Command.GoToEvent);
+			broker.notifyEvent(this.getPerson(), BraceletEvent.GO_TO_CONCERT);
 			RunBracelet();
 		}
 	}
@@ -403,7 +410,7 @@ public class Bracelet {
 		dataBase.put(person.getId(), dbE);
 		UpdateMessage updateMessage = new UpdateMessage(this, dataBase);
 		// storeUpdateMessage(updateMessage);
-		_broker.DoBroadcast(this, getPosition(), radio.getRange_M(), updateMessage);
+		broker.DoBroadcast(this, getPosition(), radio.getRange_M(), updateMessage);
 
 		// int myId = person.getId();
 		// HashSet<Long> myMessages = receivedMessages.getOrDefault(myId, new
@@ -421,7 +428,7 @@ public class Bracelet {
 
 	protected void BroadcastMessages(ArrayList<Message> messages) {
 		for (Message msg : messages) {
-			_broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
+			broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
 		}
 
 	}

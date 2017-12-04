@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.group14.findeyourfriend.Clock;
 import com.group14.findeyourfriend.bracelet.Bracelet;
+import com.group14.findeyourfriend.bracelet.BraceletEvent;
 import com.group14.findeyourfriend.bracelet.DatabaseEntry;
 import com.group14.findeyourfriend.bracelet.Person;
 import com.group14.findeyourfriend.utils.Graph;
@@ -32,13 +34,16 @@ public class StatisticsCalculator {
 	private Pair<Double, Integer> currentPercentagePeopleInDatabase;
 	private Pair<Double, Integer> currentPercentageRecentLocationsInDatabase;
 	private Pair<Double, Integer> totalPercentageRecentLocationsInDatabase;
+	private Pair<Double, Integer> avarageTimeToFindAFriend;
 	private Double percentagePeopleOutOfRange;
+	private Integer failedFriendSearch;
 	// test pursoses, leave default in prod
 	Supplier<Long> getCurrentTime;
 	private Integer timeThreshold = 15000;
 	private double outOfRangeCoefficient = 0.5; // % of how many people in the system you need to reach (even
 												// indirectly = thorugh others) in order to be considered in the
 												// range
+	private ConcurrentHashMap<Integer, Pair<BraceletEvent, Long>> mapBraceletEvents;
 
 	public StatisticsCalculator() {
 		totalAverageAgeInDatabase = Pair.of(0d, 0);
@@ -47,7 +52,10 @@ public class StatisticsCalculator {
 		currentAverageAgeInDatabase = Pair.of(0d, 0);
 		currentPercentagePeopleInDatabase = Pair.of(0d, 0);
 		currentPercentageRecentLocationsInDatabase = Pair.of(0d, 0);
+		avarageTimeToFindAFriend = Pair.of(0d, 0);
+		failedFriendSearch = 0;
 		getCurrentTime = () -> Clock.getClock();
+		mapBraceletEvents = new ConcurrentHashMap<Integer, Pair<BraceletEvent, Long>>();
 	}
 
 	public void calculate(Collection<Person> guests) {
@@ -216,6 +224,22 @@ public class StatisticsCalculator {
 		return percentagePeopleOutOfRange;
 	}
 
+	@RequestMapping("/failed-friend-search")
+	@CrossOrigin
+	public Integer getFailedFriendSearch() {
+		return failedFriendSearch;
+	}
+
+	@RequestMapping("/avg-time-to-find-friend")
+	@CrossOrigin
+	public Double getAvarageTimeToFindAFriend() {
+		if (avarageTimeToFindAFriend.getRight() <= 0) {
+			return 0d;
+		}
+		return new BigDecimal(avarageTimeToFindAFriend.getLeft() / avarageTimeToFindAFriend.getRight())
+				.setScale(2, RoundingMode.HALF_UP).doubleValue();
+	}
+
 	public void setGetCurrentTime(Supplier<Long> getCurrentTime) {
 		this.getCurrentTime = getCurrentTime;
 	}
@@ -251,5 +275,37 @@ public class StatisticsCalculator {
 		});
 
 		return graph;
+	}
+
+	public void braceletEvent(Pair<Person, BraceletEvent> event) {
+		Pair<BraceletEvent, Long> pair = mapBraceletEvents.get(event.getKey().getId());
+		if (pair != null) {
+			switch (event.getRight()) {
+			case START_SEARCH:
+				//
+				break;
+			case FRIEND_MET:
+				if (pair.getLeft() == BraceletEvent.FRIEND_FOUND_IN_DB) {
+					// search succeded
+					avarageTimeToFindAFriend = Pair.of(
+							avarageTimeToFindAFriend.getKey() + (Clock.getClock() - pair.getRight()),
+							avarageTimeToFindAFriend.getValue() + 1);
+				}
+				break;
+			case FRIEND_FOUND_IN_DB:
+				// nothing to do
+				break;
+			case GO_TO_CONCERT:
+				// nothing to do
+				break;
+			case FRIEND_NOT_FOUND_IN_DB:
+				// search failed
+				failedFriendSearch++;
+				break;
+			default:
+				break;
+			}
+		}
+		mapBraceletEvents.put(event.getKey().getId(), Pair.of(event.getRight(), Clock.getClock()));
 	}
 }
