@@ -75,7 +75,7 @@ public class Simulation {
 		}
 		this.simulationTime = simulationTime;
 		this.SRSimulation = SRSimulation;
-		notifier.notifyConcertEvents(concertEvents);
+		if (notifier != null) notifier.notifyConcertEvents(concertEvents);
 		guests = new HashMap<>();
 		map = new Map(Constants.MAX_HEIGHT, Constants.MAX_WIDTH);
 		map.setSimulation(this);
@@ -91,7 +91,7 @@ public class Simulation {
 			ArrayList<Event> events = timeEvents.getOrDefault(Clock.getClock().intValue(), new ArrayList<>());
 			for (Event e : events) {
 				e.process();
-				notifier.addEvent(e);
+				if (notifier != null) notifier.addEvent(e);
 			}
 			for (Person person : guests.values())
 				person.getBracelet().transition(Clock.getClock().intValue());

@@ -346,6 +346,8 @@ public class Bracelet {
 		synchronized (_stateLock) {
 			DebugLog.log(this.person.getId() + ": started searching for " + person.getId());
 			_lookForPerson = person;
+			double distance = this.person.getPosition().DistanceTo(_lookForPerson.getPosition());
+			System.out.println("Distance to other person is: " + String.format("%1$,.2f", distance));
 			stateMachine.MoveNext(Command.StartSearch);
 			broker.notifyEvent(this.getPerson(), BraceletEvent.START_SEARCH);
 			RunBracelet();
