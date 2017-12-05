@@ -8,7 +8,6 @@ import java.util.HashMap;
 public class SearchResponse extends Message{
 
     private SRBracelet sender;
-    private SRBracelet receiver;
     // inherits timestamp
     private HashMap<Integer, DatabaseEntry> searchedLocations = new HashMap<>();
 
@@ -20,11 +19,12 @@ public class SearchResponse extends Message{
 
     @Override
     public void process() {
-        receiver.storeSearchResponseToRelay(this);
+        SRBracelet srReceiver = (SRBracelet) receiver;
+        srReceiver.storeSearchResponseToRelay(this);
         for (int dbKey: searchedLocations.keySet()) {
-            if(dbKey == receiver.getPerson().getId()) continue; //Dont update my own position
+            if(dbKey == srReceiver.getPerson().getId()) continue; //Dont update my own position
             DatabaseEntry entry = searchedLocations.get(dbKey);
-            if(entry.getTimeStamp() > receiver.getDataBase().getOrDefault(dbKey, new DatabaseEntry()).getTimeStamp()) receiver.getDataBase().put(dbKey, entry); // update or overwrite
+            if(entry.getTimeStamp() > srReceiver.getDataBase().getOrDefault(dbKey, new DatabaseEntry()).getTimeStamp()) srReceiver.getDataBase().put(dbKey, entry); // update or overwrite
         }
     }
 }

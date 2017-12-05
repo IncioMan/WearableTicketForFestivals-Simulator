@@ -39,6 +39,13 @@ public class SRStateMachine extends StateMachineProcess{
         _transitions.put(new StateTransition(ProcessState.RESPONSE_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
         _transitions.put(new StateTransition(ProcessState.REQUEST_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
         _transitions.put(new StateTransition(ProcessState.INTERPRET_STATE, Command.StartSearch), ProcessState.S_LOOKUP_STATE);
+
+        _transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.GoToEvent), ProcessState.LED_STATE);
+        _transitions.put(new StateTransition(ProcessState.COMMUNICATION_STATE, Command.GoToEvent),
+                ProcessState.LED_STATE);
+        _transitions.put(new StateTransition(ProcessState.LED_STATE, Command.GoToEvent), ProcessState.LED_STATE);
+        _transitions.put(new StateTransition(ProcessState.UPDATE_STATE, Command.GoToEvent), ProcessState.LED_STATE);
+        _transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.TimerEvent), ProcessState.LED_STATE);
     }
 
 }

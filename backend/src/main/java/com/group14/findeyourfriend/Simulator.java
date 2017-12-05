@@ -37,17 +37,15 @@ public class Simulator {
 	@Scheduled(fixedDelay = 15000)
 	public void start() {
 		try {
+			//InputStream eventStream = Simulator.class.getClassLoader().getResourceAsStream("events.txt");
+			//InputStream paramStream = Simulator.class.getClassLoader().getResourceAsStream("params.txt");
 			InputStream eventStream = Simulator.class.getClassLoader().getResourceAsStream("events.txt");
-			InputStream paramStream = Simulator.class.getClassLoader().getResourceAsStream("params.txt");
-			// InputStream eventStream =
-			// Simulator.class.getClassLoader().getResourceAsStream("SRevents.txt");
-			// InputStream paramStream =
-			// Simulator.class.getClassLoader().getResourceAsStream("SRparams.txt");
+			InputStream paramStream = Simulator.class.getClassLoader().getResourceAsStream("SRparams.txt");
 			Queue<Event> events = EventParser.parse(eventStream);
-			Queue<Parameters> params = ParameterParser.parse(paramStream, false);
+			Queue<Parameters> params = ParameterParser.parse(paramStream, true);
 			simulation.add(calculator::calculate);
 			simulation.addEventListener(calculator::braceletEvent);
-			simulation.init(events, false, 86400000);// Simulate 1 days in ms
+			simulation.init(events, true, 86400000);// Simulate 1 days in ms
 			simulation.run(params.poll());
 			// Chart.main(new String[0]);// Show chart
 		} catch (IOException e) {

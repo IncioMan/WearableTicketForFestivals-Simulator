@@ -15,7 +15,7 @@ import javafx.scene.chart.XYChart;
 
 public class SRBracelet extends Bracelet {
 
-	private SearchRequest requestToBroadcast;
+    private SearchRequest requestToBroadcast;
 	private ArrayList<Message> requestsToRelay = new ArrayList<>();
 	private ArrayList<Message> responsesToRelay = new ArrayList<>();
 	private ArrayList<Message> responsesToBroadcast = new ArrayList<>();
@@ -79,7 +79,6 @@ public class SRBracelet extends Bracelet {
 
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.RESPONSE_STATE) {
-				DebugLog.log(person.getId() + ": Broadcasting search responses");
 				BroadcastSearchResponses();
 				BroadcastMessages(requestsToRelay);
 				BroadcastMessages(responsesToRelay);
@@ -199,11 +198,11 @@ public class SRBracelet extends Bracelet {
 			OnTimerRQP();
 		}
 
-		if (clock % 60000 == 0) {
-			ArrayList<XYChart.Data> dataPoints = Chart.DataPointsMap.getOrDefault(person.getId(), new ArrayList<>());
-			dataPoints.add(new XYChart.Data(clock / 60000, battery.getEnergyLeft())); // every "minute" new datapoint
-			Chart.DataPointsMap.putIfAbsent(person.getId(), dataPoints);
-		}
+        if (clock % 60000 == 0) {
+            ArrayList<XYChart.Data> dataPoints = Chart.DataPointsMap.getOrDefault(person.getId(), new ArrayList<>());
+            dataPoints.add(new XYChart.Data(clock / 60000, battery.getEnergyLeft())); // every "minute" new datapoint
+            Chart.DataPointsMap.putIfAbsent(person.getId(), dataPoints);
+        }
 
 	}
 
@@ -221,8 +220,9 @@ public class SRBracelet extends Bracelet {
 	private void BroadcastSearchRequest() {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.REQUEST_STATE) {
-				requestToBroadcast = new SearchRequest(this, _lookForPerson.getId());
-				broker.DoBroadcast(this, getPosition(), radio.getRange_M(), requestToBroadcast);
+				if(requestToBroadcast == null)
+			        requestToBroadcast = new SearchRequest(this, _lookForPerson.getId());
+                broker.DoBroadcast(this, getPosition(), radio.getRange_M(), requestToBroadcast);
 			}
 		}
 	}
@@ -242,9 +242,11 @@ public class SRBracelet extends Bracelet {
 	private void BroadcastSearchResponses() {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.RESPONSE_STATE) {
-				for (Message msg : responsesToBroadcast)
-					broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
-
+				if(!responsesToBroadcast.isEmpty()){
+                    DebugLog.log(person.getId() + ": Broadcasting search responses");
+                    for (Message msg : responsesToBroadcast)
+                        broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
+                }
 			}
 		}
 	}
@@ -253,8 +255,14 @@ public class SRBracelet extends Bracelet {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.LISTEN_STATE) {
 				DebugLog.logTimer(person.getId() + ": OnTimerRLP");
-				BroadcastMessages(requestsToRelay);
-				BroadcastMessages(responsesToRelay);
+				if(!requestsToRelay.isEmpty()){
+                    DebugLog.log(person.getId() + ": Relaying search requests");
+				    BroadcastMessages(requestsToRelay);
+                }
+                if(!responsesToRelay.isEmpty()){
+                    DebugLog.log(person.getId() + ": Relaying search responses");
+				    BroadcastMessages(responsesToRelay);
+                }
 			}
 		}
 	}
@@ -303,6 +311,7 @@ public class SRBracelet extends Bracelet {
 
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.REQUEST_STATE) {
+                requestToBroadcast = null;
 				requestsToRelay = new ArrayList<>();
 				responsesToRelay = new ArrayList<>();
 				DebugLog.logTimer(person.getId() + ": OnTimerIP");

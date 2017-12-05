@@ -20,14 +20,6 @@ import javafx.scene.chart.XYChart;
 public class Bracelet {
 	private boolean guiding;
 	private boolean found;
-	// private final StateMachineProcess stateMachine = new StateMachineProcess();
-	// private boolean _timerFRun;
-	// private boolean _timerLedRun;
-	// private boolean _timerRCPRun;
-	// private boolean _timerUpRun;
-	// private Broker _broker;
-	// private final HashMap<Integer, DatabaseEntry> dataBase = new HashMap<>();
-	// private HashMap<Integer, HashSet<Long>> receivedMessages = new HashMap<>();
 
 	protected Battery battery;
 	protected Radio radio;
@@ -46,7 +38,7 @@ public class Bracelet {
 
 	protected Broker broker;
 
-	protected ArrayList<Message> updateMessagesToRelay = new ArrayList<>();
+	//protected ArrayList<Message> updateMessagesToRelay = new ArrayList<>();
 
 	protected final HashMap<Integer, DatabaseEntry> dataBase = new HashMap<>();
 
@@ -60,6 +52,7 @@ public class Bracelet {
 
 	protected double visualFeedBackCurrent_mA;
 	protected double visualFeedBackOnTime;
+
 	private Position event;
 	private boolean _timerMoveToEventRun;
 	private int secondsAtEvent;
@@ -70,6 +63,11 @@ public class Bracelet {
 		this.person = person;
 		this.cpu = c;
 		stateMachine = new StateMachineProcess();
+
+        DatabaseEntry dbE = new DatabaseEntry();
+        dbE.setPosition(getPosition());
+        dbE.setTimeStamp(Clock.getClock());
+        dataBase.put(person.getId(), dbE);
 
 		broadcastTime = 0.1;
 		updateLedTime = 0.0001;
@@ -101,84 +99,84 @@ public class Bracelet {
 
 	protected void LedState() {
 		switch (stateMachine.getLastCommand()) {
-		case TimerEvent:
-			if (person.getPosition().DistanceTo(event) > _proximity) {
-				// Update LEDS
-				person.GoTowards(event);
-				DebugLog.log(person.getId() + " not arrived to the event " + event.getCoordinates() + " yet");
-			} else {
-				if (secondsAtEvent > 100) {
-					_timerMoveToEventRun = false;
-					event = null;
-					secondsAtEvent = 0;
-					// Turn off LEDs
-					_timerLedRun = false;
-					person.setSpeed(Vector2.getRandomVector());
+			case TimerEvent:
+				if (person.getPosition().DistanceTo(event) > _proximity) {
+					// Update LEDS
+					person.GoTowards(event);
+					DebugLog.log(person.getId() + " not arrived to the event " + event.getCoordinates() + " yet");
 				} else {
-					DebugLog.log(person.getId() + " has arrived to the event " + event.getCoordinates());
-					secondsAtEvent++;
-					person.setSpeed(Vector2.Zero); // Stop when found!
+					if (secondsAtEvent > 100) {
+						_timerMoveToEventRun = false;
+						event = null;
+						secondsAtEvent = 0;
+						// Turn off LEDs
+						_timerLedRun = false;
+						person.setSpeed(Vector2.getRandomVector());
+					} else {
+						DebugLog.log(person.getId() + " has arrived to the event " + event.getCoordinates());
+						secondsAtEvent++;
+						person.setSpeed(Vector2.Zero); // Stop when found!
+					}
 				}
-			}
-		case TimerF:
-			if (_lookForPerson != null && !IsFound()) {
-				synchronized (_dbLock) {
-					if (dataBase.containsKey(_lookForPerson.getId())) {
-						DatabaseEntry dbEntry = dataBase.get(_lookForPerson.getId());
-						if (person.getPosition().DistanceTo(dbEntry.getPosition()) > _proximity) {
-							// Decrement battery from CPU
-							battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);
-							person.GoTowards(dbEntry.getPosition());
-							setFound(false);
-							setGuiding(true);
-							// Update LEDS
-							DebugLog.log(person.getId() + " has not Found " + _lookForPerson.getId() + " yet");
-						} else {
-							setFound(true);
-							setGuiding(false);
-							DebugLog.log(person.getId() + " has Found " + _lookForPerson.getId());
-							_timerFRun = false;
-							person.setSpeed(Vector2.Zero); // Stop when found!
-							_lookForPerson.setSpeed(Vector2.Zero); // Other person stop
-							broker.notifyEvent(this.getPerson(), BraceletEvent.FRIEND_MET);
-							// Turn off LEDs
-							_timerLedRun = false;
+			case TimerF:
+				if (_lookForPerson != null && !IsFound()) {
+					synchronized (_dbLock) {
+						if (dataBase.containsKey(_lookForPerson.getId())) {
+							DatabaseEntry dbEntry = dataBase.get(_lookForPerson.getId());
+							if (person.getPosition().DistanceTo(dbEntry.getPosition()) > _proximity) {
+								// Decrement battery from CPU
+								battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);
+								person.GoTowards(dbEntry.getPosition());
+								setFound(false);
+								setGuiding(true);
+								// Update LEDS
+								DebugLog.log(person.getId() + " has not Found " + _lookForPerson.getId() + " yet");
+							} else {
+								setFound(true);
+								setGuiding(false);
+								DebugLog.log(person.getId() + " has Found " + _lookForPerson.getId());
+								_timerFRun = false;
+								person.setSpeed(Vector2.Zero); // Stop when found!
+								_lookForPerson.setSpeed(Vector2.Zero); // Other person stop
+								broker.notifyEvent(this.getPerson(), BraceletEvent.FRIEND_MET);
+								// Turn off LEDs
+								_timerLedRun = false;
+							}
 						}
 					}
 				}
-			}
-			break;
-		case TimerLed:
-			// Change the Leds??
-			synchronized (_dbLock) {
-				DatabaseEntry dbEntry = dataBase.get(_lookForPerson.getId());
-				person.GoTowards(dbEntry.getPosition());
+				break;
+			case TimerLed:
+				// Change the Leds??
+				synchronized (_dbLock) {
+					DatabaseEntry dbEntry = dataBase.get(_lookForPerson.getId());
+					person.GoTowards(dbEntry.getPosition());
+					setFound(false);
+					setGuiding(true);
+					// Update LEDS
+					battery.DecrementEnergy(visualFeedBackCurrent_mA, visualFeedBackOnTime);// Decrement battery from
+																							// showing visuals LED/Eink or
+																							// whatever
+					battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);// Decrement battery from CPU time
+				}
+				break;
+			case FriendFound: // When friend was found in the database.
+				// Start guiding??
+				DebugLog.log(person.getId() + " started looking for " + _lookForPerson.getId());
+				_timerMoveToEventRun = false; // stop going to event
+				_timerFRun = true;
+				_timerLedRun = true;
+				broker.notifyEvent(this.getPerson(), BraceletEvent.FRIEND_FOUND_IN_DB);
 				setFound(false);
 				setGuiding(true);
-				// Update LEDS
-				battery.DecrementEnergy(visualFeedBackCurrent_mA, visualFeedBackOnTime);// Decrement battery from
-																						// showing visuals LED/Eink or
-																						// whatever
-				battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);// Decrement battery from CPU time
+				break;
+			case GoToEvent:
+				DebugLog.log(person.getId() + " moving towards event " + event.getCoordinates());
+				_timerMoveToEventRun = true;
+				_timerLedRun = true;
+				_timerFRun = false;
+				break;
 			}
-			break;
-		case FriendFound: // When friend was found in the database.
-			// Start guiding??
-			DebugLog.log(person.getId() + " started looking for " + _lookForPerson.getId());
-			_timerMoveToEventRun = false; // stop going to event
-			_timerFRun = true;
-			_timerLedRun = true;
-			broker.notifyEvent(this.getPerson(), BraceletEvent.FRIEND_FOUND_IN_DB);
-			setFound(false);
-			setGuiding(true);
-			break;
-		case GoToEvent:
-			DebugLog.log(person.getId() + " moving towards event " + event.getCoordinates());
-			_timerMoveToEventRun = true;
-			_timerLedRun = true;
-			_timerFRun = false;
-			break;
-		}
 		stateMachine.MoveNext(Command.Sleep);
 	}
 
@@ -187,11 +185,10 @@ public class Bracelet {
 		_timerUpRun = true;
 
 		CreateUpdateMessage();
-		BroadcastMessages(updateMessagesToRelay);
+		//BroadcastMessages(updateMessagesToRelay);
 
 		battery.DecrementEnergy(cpu.cpuCurrentBroadcastAvg_mA, cpu.timerUpDelay);// Decrement battery from CPU for the
 																					// entire CreateUpdateMessage
-		// TODO decrement more energy for the relay?
 		// radio.setState(RadioState.Transmitting);
 		// battery.DecrementEnergy(radio.getConsumption(), broadcastTime);// Decrement
 		// from radio for single CreateUpdateMessage
@@ -201,7 +198,7 @@ public class Bracelet {
 	}
 
 	protected void UpdateState() {
-		DebugLog.log(person.getId() + ": Updating locations");
+		//DebugLog.log(person.getId() + ": Updating locations");
 		battery.DecrementEnergy(cpu.cpuCurrentRun_mA, 1000);
 		// Some logic needed here
 		stateMachine.MoveNext(Command.Sleep);
@@ -300,7 +297,7 @@ public class Bracelet {
 		// _timerR.cancel(); // Stop the rebroadcast timer
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.COMMUNICATION_STATE) {
-				updateMessagesToRelay = new ArrayList<>();
+				//updateMessagesToRelay = new ArrayList<>();
 				DebugLog.logTimer(person.getId() + ": OnTimerUp");
 				stateMachine.MoveNext(Command.TimerUp);
 				RunBracelet();
@@ -344,10 +341,10 @@ public class Bracelet {
 
 	public void StartSearch(Person person) {
 		synchronized (_stateLock) {
-			DebugLog.log(this.person.getId() + ": started searching for " + person.getId());
+			//DebugLog.log(this.person.getId() + ": started searching for " + person.getId());
 			_lookForPerson = person;
 			double distance = this.person.getPosition().DistanceTo(_lookForPerson.getPosition());
-			System.out.println("Distance to other person is: " + String.format("%1$,.2f", distance));
+			//System.out.println("Distance to other person is: " + String.format("%1$,.2f", distance));
 			stateMachine.MoveNext(Command.StartSearch);
 			broker.notifyEvent(this.getPerson(), BraceletEvent.START_SEARCH);
 			RunBracelet();
@@ -482,7 +479,5 @@ public class Bracelet {
 		return person;
 	}
 
-	public void storeUpdateMessage(UpdateMessage msg) {
-		updateMessagesToRelay.add(msg);
-	}
+	//public void storeUpdateMessage(UpdateMessage msg) {updateMessagesToRelay.add(msg);}
 }

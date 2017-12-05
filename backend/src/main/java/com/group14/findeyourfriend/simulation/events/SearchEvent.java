@@ -19,23 +19,12 @@ public class SearchEvent extends Event {
 					if (p.getName().equals(preyName)) {
 						h.getBracelet().StartSearch(p);
 						DebugLog.log("SearchTimer: " + h.toString() + " searching for " + p.toString());
+						break;
 					}
 				}
 			}
-		} // Change to hashmap and get by id? name is not unique?
+		}
 
-		// TODO implement time elapsed?
-
-		// TimerTask searchTask = new TimerTask() {
-		// @Override
-		// public void run() {
-		// Person h = sim.getPersonById(hunterId);
-		// Person p = sim.getPersonById(preyId);
-		// h.getBracelet().StartSearch(p);
-		// DebugLog.log("SearchTimer: " + h.toString() + " searching for " +
-		// p.toString());
-		// }
-		// };
 	}
 
 	public void setHunterName(String hName) {

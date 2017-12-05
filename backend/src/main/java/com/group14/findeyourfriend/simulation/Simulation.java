@@ -88,13 +88,14 @@ public class Simulation {
 		// radio = new Radio(1000, 0.01, 7.0, 5);
 
 		while (Clock.getClock() <= simulationTime) {
+			for (Person person : guests.values())
+				person.getBracelet().transition(Clock.getClock().intValue());
+
 			ArrayList<Event> events = timeEvents.getOrDefault(Clock.getClock().intValue(), new ArrayList<>());
 			for (Event e : events) {
 				e.process();
 				if (notifier != null) notifier.addEvent(e);
 			}
-			for (Person person : guests.values())
-				person.getBracelet().transition(Clock.getClock().intValue());
 
 			if (Clock.getClock() % 500 == 0) {
 				for (Person person : guests.values())
@@ -120,6 +121,12 @@ public class Simulation {
 
 	public void newGuestsArrived(List<Person> newGuests) {
 		for (Person guest : newGuests) {
+			guest.setPosition(
+					new Position(ThreadLocalRandom.current().nextInt(Constants.MIN_WIDTH, Constants.MAX_WIDTH),
+							ThreadLocalRandom.current().nextInt(Constants.MIN_HEIGHT, Constants.MAX_HEIGHT)));
+
+			guest.setSpeed(Vector2.getRandomVector());
+
 			Bracelet bracelet;
 			if (SRSimulation)
 				bracelet = new SRBracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest);
@@ -128,12 +135,8 @@ public class Simulation {
 			bracelet.Subscribe(broker);
 			guest.setBracelet(bracelet);
 
-			guest.setPosition(
-					new Position(ThreadLocalRandom.current().nextInt(Constants.MIN_WIDTH, Constants.MAX_WIDTH),
-							ThreadLocalRandom.current().nextInt(Constants.MIN_HEIGHT, Constants.MAX_HEIGHT)));
-
-			guest.setSpeed(Vector2.getRandomVector());
 			DebugLog.log("ArrivalEvent: guest " + guest.getId() + " arrived");
+
 			guests.put(guest.getId(), guest);
 		}
 	}
