@@ -1,5 +1,6 @@
 package com.group14.findeyourfriend.message;
 
+import com.group14.findeyourfriend.Clock;
 import com.group14.findeyourfriend.bracelet.DatabaseEntry;
 import com.group14.findeyourfriend.bracelet.SRBracelet;
 
@@ -13,7 +14,7 @@ public class SearchResponse extends Message{
 
     public SearchResponse(SRBracelet sender, HashMap<Integer, DatabaseEntry> locations){
         this.sender = sender;
-        this.timestamp = System.currentTimeMillis();
+        this.timestamp = Clock.getClock();
         searchedLocations = locations;
     }
 

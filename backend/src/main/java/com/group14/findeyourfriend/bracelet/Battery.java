@@ -1,12 +1,5 @@
 package com.group14.findeyourfriend.bracelet;
 
-//========================================================================
-
-// This conversion was produced by the Free Edition of
-// C# to Java Converter courtesy of Tangible Software Solutions.
-// Order the Premium Edition at https://www.tangiblesoftwaresolutions.com
-//========================================================================
-
 public class Battery
 {
 	private double Capacity_mAh;
@@ -24,10 +17,6 @@ public class Battery
 	public final double getEnergyLeft()
 	{
 		return energyLeft;
-	}
-	public final void setEnergyLeft(double value)
-	{
-		energyLeft = value;
 	}
 
 

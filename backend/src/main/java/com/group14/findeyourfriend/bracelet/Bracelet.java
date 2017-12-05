@@ -47,7 +47,7 @@ public class Bracelet {
 
 	protected double _proximity = 2.0;
 
-	protected double broadcastTime;
+	//protected double broadcastTime;
 	protected double updateLedTime;
 
 	protected double visualFeedBackCurrent_mA;
@@ -55,6 +55,7 @@ public class Bracelet {
 
 	private Position event;
 	private boolean _timerMoveToEventRun;
+
 	private int secondsAtEvent;
 
 	public Bracelet(Battery b, Radio r, CPU c, Person person) {
@@ -69,7 +70,7 @@ public class Bracelet {
         dbE.setTimeStamp(Clock.getClock());
         dataBase.put(person.getId(), dbE);
 
-		broadcastTime = 0.1;
+		//broadcastTime = 0.1;
 		updateLedTime = 0.0001;
 		visualFeedBackCurrent_mA = 20;
 		visualFeedBackOnTime = 8000;
@@ -105,7 +106,7 @@ public class Bracelet {
 					person.GoTowards(event);
 					DebugLog.log(person.getId() + " not arrived to the event " + event.getCoordinates() + " yet");
 				} else {
-					if (secondsAtEvent > 100) {
+					if (secondsAtEvent > 100) { // TODO implement parameter passing?
 						_timerMoveToEventRun = false;
 						event = null;
 						secondsAtEvent = 0;
@@ -189,10 +190,7 @@ public class Bracelet {
 
 		battery.DecrementEnergy(cpu.cpuCurrentBroadcastAvg_mA, cpu.timerUpDelay);// Decrement battery from CPU for the
 																					// entire CreateUpdateMessage
-		// radio.setState(RadioState.Transmitting);
-		// battery.DecrementEnergy(radio.getConsumption(), broadcastTime);// Decrement
-		// from radio for single CreateUpdateMessage
-		// radio.setState(RadioState.Passive);
+        // TODO here is a crucial point. Should we decrement on a message basis or for the whole duration of the phase?
 
 		DebugLog.log(person.getId() + ": Broadcasting, collecting recent and relaying recent");
 	}
@@ -212,21 +210,27 @@ public class Bracelet {
 				battery.DecrementEnergy(cpu.cpuCurrentRun_mA, 1000);
 				if (dataBase.containsKey(_lookForPerson.getId())) {
 					// TODO implement if(!recentEnough) then it is not found
-					setGuiding(true);
-					setFound(false);
-					stateMachine.MoveNext(Command.FriendFound);
-					DebugLog.log(person.getId() + ": Found person in my DB");
+					if (Clock.isRecentEnough(dataBase.get(_lookForPerson.getId()))){
+                        setGuiding(true);
+                        setFound(false);
+                        stateMachine.MoveNext(Command.FriendFound);
+                        DebugLog.log(person.getId() + ": Found recent location in my DB");
+                    }else{
+                        DebugLog.log(person.getId() + ": Found obsolete location in my DB");
+                        broker.notifyEvent(getPerson(), BraceletEvent.FRIEND_NOT_FOUND_IN_DB);
+                        stateMachine.MoveNext(Command.FriendNotFound);
+                    }
 				} else {
+					DebugLog.log(person.getId() + ": Did not find person in my DB");
 					broker.notifyEvent(getPerson(), BraceletEvent.FRIEND_NOT_FOUND_IN_DB);
 					stateMachine.MoveNext(Command.FriendNotFound);
-					DebugLog.log(person.getId() + ": Did not find person in my DB");
 				}
 				RunBracelet();
 			}
 		}
 	}
 
-	/**
+    /**
 	 * Method run once the bracelet should go into communication phase
 	 */
 	protected void OnTimerCp() {
@@ -315,26 +319,11 @@ public class Bracelet {
 	 *
 	 */
 	public final void HandleBroadcast(Message msg) {
-		// if (senderID == this.person.getId()) {
-		// return;
-		// }
-		// HashSet<Long> senderMessageIds = receivedMessages.getOrDefault(senderId, new
-		// HashSet<>());
-		// if(senderMessageIds.contains(messageId)) return; // Only handle received
-		// message once
-		// receivedMessages.put(senderId, senderMessageIds);// Add to received messages
 
 		synchronized (_dbLock) // Thread safety locking
 		{
 			msg.process();
-			// for (int dbKey: senderDataBase.keySet()) {
-			// if(dbKey == person.getId()) continue; //Dont update my own position
-			// DatabaseEntry entry = senderDataBase.get(dbKey);
-			// if(entry.getTimeStamp() > dataBase.getOrDefault(dbKey, new
-			// DatabaseEntry()).getTimeStamp()) dataBase.put(dbKey, entry); // update or
-			// overwrite
-			// }
-			// DebugLog.logTimer(person.getId() + ": HEARD IT FROM " + senderId);
+
 		}
 
 	}
@@ -393,37 +382,15 @@ public class Bracelet {
 		return stateMachine;
 	}
 
-	// HashMap <Int, HashSet> for received messages
-	// HashSet <Long> for myMessages
-	// every message has a long ID which is the timestamp
-	// add messageID to myMessages with current timestamp
-	// put myMessages in receivedMessages
-	// create a DBentry with my position, put it in the db
-	// CreateUpdateMessage (ID, position, range, messageID, db)
-
-	//
 	private void CreateUpdateMessage() {
-		DatabaseEntry dbE = new DatabaseEntry();
-		dbE.setPosition(getPosition());
-		dbE.setTimeStamp(Clock.getClock());
-		dataBase.put(person.getId(), dbE);
-		UpdateMessage updateMessage = new UpdateMessage(this, dataBase);
-		// storeUpdateMessage(updateMessage);
-		broker.DoBroadcast(this, getPosition(), radio.getRange_M(), updateMessage);
-
-		// int myId = person.getId();
-		// HashSet<Long> myMessages = receivedMessages.getOrDefault(myId, new
-		// HashSet<>());
-		// long messageId = System.currentTimeMillis();
-		// myMessages.add(messageId);
-		// receivedMessages.put(myId, myMessages);
-		// DatabaseEntry dbE = new DatabaseEntry();
-		// dbE.setPosition(getPosition());
-		// dbE.setTimeStamp(System.currentTimeMillis());
-		// dataBase.put(person.getId(), dbE);
-		// _broker.DoBroadcast(person.getId(), getPosition(), radio.getRange_M(),
-		// updateMessage);
-	}
+        DatabaseEntry dbE = new DatabaseEntry();
+        dbE.setPosition(getPosition());
+        dbE.setTimeStamp(Clock.getClock());
+        dataBase.put(person.getId(), dbE);
+        UpdateMessage updateMessage = new UpdateMessage(this, dataBase);
+        // storeUpdateMessage(updateMessage);
+        broker.DoBroadcast(this, getPosition(), radio.getRange_M(), updateMessage);
+    }
 
 	protected void BroadcastMessages(ArrayList<Message> messages) {
 		for (Message msg : messages) {

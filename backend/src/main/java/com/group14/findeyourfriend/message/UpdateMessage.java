@@ -1,5 +1,6 @@
 package com.group14.findeyourfriend.message;
 
+import com.group14.findeyourfriend.Clock;
 import com.group14.findeyourfriend.bracelet.Bracelet;
 import com.group14.findeyourfriend.bracelet.DatabaseEntry;
 
@@ -14,7 +15,7 @@ public class UpdateMessage extends Message{
 
     public UpdateMessage(Bracelet sender, HashMap<Integer, DatabaseEntry> locations){
         this.sender = sender;
-        this.timestamp = System.currentTimeMillis();
+        this.timestamp = Clock.getClock();
         this.recentLocations = locations;
     }
 
