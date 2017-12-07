@@ -89,14 +89,16 @@ public class EventParser {
 			return sEvent;
 
 		case "C":
-			// example of CONCERT: C 1500 10,20 1,2,3,4
+			// example of CONCERT: C 1500 10,20 1,2,3,4 500
 			// (10,20) is the location of the event
 			// 1,2,3,4 are people that will go to that concert
+			// 500 is the time at which the concert ends (of the clock)
 			ConcertEvent concertEvent = new ConcertEvent();
 			concertEvent.setStart(words[1]);
 			Position concertPosition = new Position(Float.parseFloat(words[2].split(",")[0]),
 					Float.parseFloat(words[2].split(",")[1]));
 			concertEvent.setGuestsToConcert(words[3].split(","));
+			concertEvent.setEndTime(Long.parseLong(words[4]));
 			concertEvent.setConcertLocation(concertPosition);
 			return concertEvent;
 		default:

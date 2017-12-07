@@ -9,6 +9,7 @@ public class ConcertEvent extends Event {
 
 	private Set<String> guestsToConcert;
 	private Position concertLocation;
+	private Long endTime;
 
 	@Override
 	public void process() {
@@ -16,7 +17,7 @@ public class ConcertEvent extends Event {
 			if (guestsToConcert.contains(g.getId() + "")) {
 				Position position = new Position(concertLocation.getCoordinates().getX(),
 						concertLocation.getCoordinates().getY());
-				g.getBracelet().takeMeToEvent(position);
+				g.getBracelet().takeMeToEvent(this);
 			}
 		});
 	}
@@ -42,6 +43,14 @@ public class ConcertEvent extends Event {
 
 	public Set<String> getGuestsToConcert() {
 		return guestsToConcert;
+	}
+
+	public Long getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Long endTime) {
+		this.endTime = endTime;
 	}
 
 	@Override

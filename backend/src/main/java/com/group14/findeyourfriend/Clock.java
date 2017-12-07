@@ -7,8 +7,6 @@ public class Clock {
 
 	// TODO implement something to make simulation go slower?
 
-	private static Long maxAge = 60000L; // TODO implement parameter passing?
-
 	public static Long getClock() {
 		return clock;
 	}
@@ -22,8 +20,8 @@ public class Clock {
 	}
 
 	public static boolean isRecentEnough(DatabaseEntry databaseEntry) {
-		if(clock - databaseEntry.getTimeStamp() <= maxAge)
-		    return true;
+		if (clock - databaseEntry.getTimeStamp() <= Constants.RECENT_DATA_THRESHOLD)
+			return true;
 		return false;
 	}
 }

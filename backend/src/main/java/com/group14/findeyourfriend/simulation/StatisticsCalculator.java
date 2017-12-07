@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import com.group14.findeyourfriend.Clock;
+import com.group14.findeyourfriend.Constants;
 import com.group14.findeyourfriend.bracelet.Bracelet;
 import com.group14.findeyourfriend.bracelet.BraceletEvent;
 import com.group14.findeyourfriend.bracelet.DatabaseEntry;
@@ -39,7 +40,7 @@ public class StatisticsCalculator {
 	private Integer failedFriendSearch;
 	// test pursoses, leave default in prod
 	Supplier<Long> getCurrentTime;
-	private Integer timeThreshold = 15000;
+	private Long timeThreshold = Constants.RECENT_DATA_THRESHOLD;
 	private double outOfRangeCoefficient = 0.5; // % of how many people in the system you need to reach (even
 												// indirectly = thorugh others) in order to be considered in the
 												// range
@@ -114,7 +115,7 @@ public class StatisticsCalculator {
 	}
 
 	private Pair<Double, Integer> calculatePercentageRecentLocationsInDatabase(Collection<Person> guests, Long now,
-			Integer timeThreshold) {
+			Long timeThreshold) {
 		List<Bracelet> bracelets = guests.stream().map(Person::getBracelet).collect(Collectors.toList());
 		AtomicDouble avgPercentage = new AtomicDouble(0);
 		AtomicInteger counter = new AtomicInteger(0);
@@ -244,11 +245,11 @@ public class StatisticsCalculator {
 		this.getCurrentTime = getCurrentTime;
 	}
 
-	public void setTimeThreshold(Integer timeThreshold) {
+	public void setTimeThreshold(Long timeThreshold) {
 		this.timeThreshold = timeThreshold;
 	}
 
-	public Integer getTimeThreshold() {
+	public Long getTimeThreshold() {
 		return timeThreshold;
 	}
 

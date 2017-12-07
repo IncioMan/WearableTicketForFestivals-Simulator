@@ -15,4 +15,5 @@ public final class Constants {
 	public static final int MIN_HEIGHT = 0;
 	public static final int MAX_HEIGHT = 500;
 	/// #endregion
+	public static final long RECENT_DATA_THRESHOLD = 60000L;
 }

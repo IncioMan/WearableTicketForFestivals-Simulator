@@ -75,7 +75,8 @@ public class Simulation {
 		}
 		this.simulationTime = simulationTime;
 		this.SRSimulation = SRSimulation;
-		if (notifier != null) notifier.notifyConcertEvents(concertEvents);
+		if (notifier != null)
+			notifier.notifyConcertEvents(concertEvents);
 		guests = new HashMap<>();
 		map = new Map(Constants.MAX_HEIGHT, Constants.MAX_WIDTH);
 		map.setSimulation(this);
@@ -94,7 +95,8 @@ public class Simulation {
 			ArrayList<Event> events = timeEvents.getOrDefault(Clock.getClock().intValue(), new ArrayList<>());
 			for (Event e : events) {
 				e.process();
-				if (notifier != null) notifier.addEvent(e);
+				if (notifier != null)
+					notifier.addEvent(e);
 			}
 
 			if (Clock.getClock() % 500 == 0) {
@@ -105,7 +107,7 @@ public class Simulation {
 				}
 			}
 
-			if (Clock.getClock() % 200 == 0) {
+			if (Clock.getClock() % 100 == 0) {
 				// StopWatch stopWatch = new StopWatch();
 				// stopWatch.start();
 				guestsConsumers.forEach(c -> {

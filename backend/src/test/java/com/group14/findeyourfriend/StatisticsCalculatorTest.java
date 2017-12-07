@@ -47,7 +47,7 @@ public class StatisticsCalculatorTest {
 		people.add(person);
 
 		StatisticsCalculator calculator = new StatisticsCalculator();
-		calculator.setTimeThreshold(30);
+		calculator.setTimeThreshold(30l);
 		calculator.setGetCurrentTime(() -> 0l);
 		calculator.calculate(people);
 		Assert.assertEquals(40d, calculator.getTotalAverageAgeInDatabase(), 0);
