@@ -15,8 +15,6 @@ public class ConcertEvent extends Event {
 	public void process() {
 		sim.getGuests().forEach(g -> {
 			if (guestsToConcert.contains(g.getId() + "")) {
-				Position position = new Position(concertLocation.getCoordinates().getX(),
-						concertLocation.getCoordinates().getY());
 				g.getBracelet().takeMeToEvent(this);
 			}
 		});
