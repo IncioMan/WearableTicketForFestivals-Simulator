@@ -2,10 +2,10 @@ package com.group14.findeyourfriend.bracelet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import com.group14.common_interface.Position;
 import com.group14.common_interface.Vector2;
 import com.group14.findeyourfriend.Clock;
+import com.group14.findeyourfriend.Constants;
 import com.group14.findeyourfriend.chart.Chart;
 import com.group14.findeyourfriend.debug.DebugLog;
 import com.group14.findeyourfriend.message.Broker;
@@ -391,7 +391,17 @@ public class Bracelet {
 		dbE.setPosition(getPosition());
 		dbE.setTimeStamp(Clock.getClock());
 		dataBase.put(person.getId(), dbE);
-		UpdateMessage updateMessage = new UpdateMessage(this, dataBase);
+		HashMap<Integer, DatabaseEntry> tempDataBase = new HashMap<>();
+		for (int id: dataBase.keySet()) {
+			if(tempDataBase.size() < 30){ //Only send the first 30 that satisfy the recent data threshold
+				DatabaseEntry entry =  dataBase.get(id);
+				if (Clock.getClock() - entry.getTimeStamp() < Constants.RECENT_DATA_THRESHOLD){
+					tempDataBase.put(id,entry);
+				}
+			}
+
+		}
+		UpdateMessage updateMessage = new UpdateMessage(this, tempDataBase);
 		// storeUpdateMessage(updateMessage);
 		broker.DoBroadcast(this, getPosition(), radio.getRange_M(), updateMessage);
 	}

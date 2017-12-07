@@ -1,6 +1,6 @@
 # Radio range, passiveconsumtion, activeconsumption_mA, receivingconsumption_mA
 # http://www.ti.com/product/CC2640R2F/datasheet
-R 100 0.00 9.3 5.9
+R 150 0.00 9.3 5.9
 # CPU cpuCurrentSleep_mA, cpuCurrentRun_mA, cpuCurrentBroadcastAvg_mA, cpuCurrentConnectedAvg_mA, timerCpDelay, timerFDelay, timerLedDelay, timerRDelay, timerUpDelay
 # http://www.ti.com/product/CC2640R2F/datasheet
 # running 48MHz
