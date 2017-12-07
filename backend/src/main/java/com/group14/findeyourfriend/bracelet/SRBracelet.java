@@ -28,8 +28,8 @@ public class SRBracelet extends Bracelet {
 	private boolean timerRRPRun;
 	private boolean timerRQPRun;
 
-	public SRBracelet(Battery b, Radio r, CPU c, Person owner) {
-		super(b, r, c, owner);
+	public SRBracelet(Battery b, Radio r, CPU c, Person owner, long clockOffset) {
+		super(b, r, c, owner, clockOffset);
 		stateMachine = new SRStateMachine();
 	}
 
@@ -147,7 +147,8 @@ public class SRBracelet extends Bracelet {
 	}
 
 	@Override
-	public void transition(int clock) {
+	public void transition(long clock) {
+		clock =  clock - clockOffset;
 		if (clock % cpu.timerCpDelay == 0) {
 			// Goto Communication phase
 			OnTimerCp();

@@ -131,7 +131,7 @@ public class Simulation {
 
 			Bracelet bracelet;
 			if (SRSimulation)
-				bracelet = new SRBracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest);
+				bracelet = new SRBracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest, Clock.getClock());
 			else
 				bracelet = new Bracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest, Clock.getClock());
 			bracelet.Subscribe(broker);
