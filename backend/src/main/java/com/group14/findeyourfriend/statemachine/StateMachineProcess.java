@@ -91,6 +91,7 @@ public class StateMachineProcess {
 				ProcessState.LED_STATE);
 		_transitions.put(new StateTransition(ProcessState.LED_STATE, Command.GoToEvent), ProcessState.LED_STATE);
 		_transitions.put(new StateTransition(ProcessState.UPDATE_STATE, Command.GoToEvent), ProcessState.LED_STATE);
+		_transitions.put(new StateTransition(ProcessState.REQUEST_STATE, Command.GoToEvent), ProcessState.LED_STATE);
 		_transitions.put(new StateTransition(ProcessState.SLEEP_STATE, Command.TimerEvent), ProcessState.LED_STATE);
 	}
 

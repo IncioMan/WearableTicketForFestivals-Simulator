@@ -37,7 +37,10 @@ public class StatisticsCalculator {
 	private StatisticResult currentPercentageRecentLocationsInDatabase;
 	private Pair<Double, Integer> totalPercentageRecentLocationsInDatabase;
 	private Pair<Double, Integer> avarageTimeToFindAFriend;
-	private List<Number[]> currentAverageAgeInDatabaseOvertime, percentagePeopleOutOfRangeOvertime;
+	private List<Number[]> currentAverageAgeInDatabaseOvertime, currentPercentagePeopleInDatabaseOvertime,
+			percentagePeopleOutOfRangeOvertime, currentPercentageRecentLocationsInDatabaseOvertime,
+			minCurrentPercentageRecentLocationsInDatabaseOvertime,
+			maxCurrentPercentageRecentLocationsInDatabaseOvertime;
 	private Double percentagePeopleOutOfRange;
 	private Integer failedFriendSearch;
 	// test pursoses, leave default in prod
@@ -58,6 +61,10 @@ public class StatisticsCalculator {
 		avarageTimeToFindAFriend = Pair.of(0d, 0);
 		currentAverageAgeInDatabaseOvertime = new CopyOnWriteArrayList<>();
 		percentagePeopleOutOfRangeOvertime = new CopyOnWriteArrayList<>();
+		currentPercentagePeopleInDatabaseOvertime = new CopyOnWriteArrayList<>();
+		currentPercentageRecentLocationsInDatabaseOvertime = new CopyOnWriteArrayList<>();
+		minCurrentPercentageRecentLocationsInDatabaseOvertime = new CopyOnWriteArrayList<>();
+		maxCurrentPercentageRecentLocationsInDatabaseOvertime = new CopyOnWriteArrayList<>();
 		failedFriendSearch = 0;
 		getCurrentTime = () -> Clock.getClock();
 		mapBraceletEvents = new ConcurrentHashMap<Integer, Pair<BraceletEvent, Long>>();
@@ -65,10 +72,6 @@ public class StatisticsCalculator {
 
 	public void calculate(Collection<Person> guests) {
 		currentAverageAgeInDatabase = calculateAvgAgeLocationsDB(guests, getCurrentTime.get());
-		if (Clock.getClock() % 2000 == 0) {
-			currentAverageAgeInDatabaseOvertime
-					.add(new Number[] { Clock.getClock(), getCurrentAverageAgeInDatabase() });
-		}
 		totalAverageAgeInDatabase = Pair.of(totalAverageAgeInDatabase.getLeft() + currentAverageAgeInDatabase.getLeft()//
 				, totalAverageAgeInDatabase.getRight() + currentAverageAgeInDatabase.getRight());
 		//
@@ -84,8 +87,18 @@ public class StatisticsCalculator {
 				, totalPercentageRecentLocationsInDatabase.getRight()
 						+ currentPercentageRecentLocationsInDatabase.getCurrentValue().getRight());
 		percentagePeopleOutOfRange = calculatePercentagePeopleOutOfRange(guests);
-		if (Clock.getClock() % 2000 == 0) {
+		if (Clock.getClock() % 4000 == 0) {
 			percentagePeopleOutOfRangeOvertime.add(new Number[] { Clock.getClock(), getPercentagePeopleOutOfRange() });
+			currentAverageAgeInDatabaseOvertime
+					.add(new Number[] { Clock.getClock(), getCurrentAverageAgeInDatabase() });
+			currentPercentagePeopleInDatabaseOvertime
+					.add(new Number[] { Clock.getClock(), getCurrentPercentagePeopleInDatabase() });
+			currentPercentageRecentLocationsInDatabaseOvertime
+					.add(new Number[] { Clock.getClock(), getCurrentPercentageRecentLocationsInDatabase() });
+			maxCurrentPercentageRecentLocationsInDatabaseOvertime
+					.add(new Number[] { Clock.getClock(), currentPercentageRecentLocationsInDatabase.getMaxValue() });
+			minCurrentPercentageRecentLocationsInDatabaseOvertime
+					.add(new Number[] { Clock.getClock(), currentPercentageRecentLocationsInDatabase.getMinValue() });
 		}
 		// System.out.println("Current average age in DB: " +
 		// getCurrentAverageAgeInDatabase() / 1000 + " s");
@@ -196,12 +209,6 @@ public class StatisticsCalculator {
 				.setScale(2, RoundingMode.HALF_UP).doubleValue();
 	}
 
-	@RequestMapping("/current-avg-age-in-db-overtime")
-	@CrossOrigin
-	public List<Number[]> getCurrentAverageAgeInDatabaseOvertime() {
-		return currentAverageAgeInDatabaseOvertime;
-	}
-
 	@RequestMapping("/current-percentage-people-in-db")
 	@CrossOrigin
 	public Double getCurrentPercentagePeopleInDatabase() {
@@ -270,10 +277,41 @@ public class StatisticsCalculator {
 		return percentagePeopleOutOfRange;
 	}
 
+	// OVERTIME METRICS
+	@RequestMapping("/current-avg-age-in-db-overtime")
+	@CrossOrigin
+	public List<Number[]> getCurrentAverageAgeInDatabaseOvertime() {
+		return currentAverageAgeInDatabaseOvertime;
+	}
+
 	@RequestMapping("/current-percentage-people-out-of-range-overtime")
 	@CrossOrigin
 	public List<Number[]> getPercentagePeopleOutOfRangeOvertime() {
 		return percentagePeopleOutOfRangeOvertime;
+	}
+
+	@RequestMapping("/current-percentage-people-in-db-overtime")
+	@CrossOrigin
+	public List<Number[]> getCurrentPercentagePeopleInDatabaseOvertime() {
+		return currentPercentagePeopleInDatabaseOvertime;
+	}
+
+	@RequestMapping("/current-percentage-recent-locations-in-db-overtime")
+	@CrossOrigin
+	public List<Number[]> getCurrentPercentageRecentLocationsInDatabaseOvertime() {
+		return currentPercentageRecentLocationsInDatabaseOvertime;
+	}
+
+	@RequestMapping("/max-current-percentage-recent-locations-in-db-overtime")
+	@CrossOrigin
+	public List<Number[]> getMaxCurrentPercentageRecentLocationsInDatabaseOvertime() {
+		return maxCurrentPercentageRecentLocationsInDatabaseOvertime;
+	}
+
+	@RequestMapping("/min-current-percentage-recent-locations-in-db-overtime")
+	@CrossOrigin
+	public List<Number[]> getMinCurrentPercentageRecentLocationsInDatabaseOvertime() {
+		return minCurrentPercentageRecentLocationsInDatabaseOvertime;
 	}
 
 	@RequestMapping("/failed-friend-search")

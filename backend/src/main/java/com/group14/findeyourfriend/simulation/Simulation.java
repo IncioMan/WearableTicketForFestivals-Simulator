@@ -107,7 +107,7 @@ public class Simulation {
 				}
 			}
 
-			if (Clock.getClock() % 100 == 0) {
+			if (Clock.getClock() % 400 == 0) {
 				// StopWatch stopWatch = new StopWatch();
 				// stopWatch.start();
 				guestsConsumers.forEach(c -> {
