@@ -19,7 +19,7 @@ public class StatisticsCalculatorTest {
 	public void testAvarageAgeInDatabase() {
 		List<Person> people = new ArrayList<>();
 		Person person = new Person();
-		Bracelet bracelet = new Bracelet(null, null, null, person);
+		Bracelet bracelet = new Bracelet(null, null, null, person, 0l);
 		person.setBracelet(bracelet);
 		DatabaseEntry databaseEnty = new DatabaseEntry();
 		databaseEnty.setPosition(null);
@@ -33,7 +33,7 @@ public class StatisticsCalculatorTest {
 		people.add(person);
 
 		person = new Person();
-		bracelet = new Bracelet(null, null, null, person);
+		bracelet = new Bracelet(null, null, null, person, 0l);
 		person.setBracelet(bracelet);
 		databaseEnty = new DatabaseEntry();
 		databaseEnty.setPosition(null);
@@ -58,7 +58,7 @@ public class StatisticsCalculatorTest {
 		Assert.assertEquals(50, calculator.getTotalPercentageRecentLocationsInDatabase(), 0);
 
 		person = new Person();
-		bracelet = new Bracelet(null, null, null, person);
+		bracelet = new Bracelet(null, null, null, person, 0l);
 		person.setBracelet(bracelet);
 		databaseEnty = new DatabaseEntry();
 		databaseEnty.setPosition(null);
@@ -85,19 +85,19 @@ public class StatisticsCalculatorTest {
 		List<Person> people = new ArrayList<>();
 		Person person = new Person(0);
 		Radio radio = new Radio(2, 0, 0, 0);
-		Bracelet bracelet = new Bracelet(null, radio, null, person);
+		Bracelet bracelet = new Bracelet(null, radio, null, person, 0l);
 		person.setBracelet(bracelet);
 		person.setPosition(new Position(0, 0));
 		people.add(person);
 
 		person = new Person(1);
-		bracelet = new Bracelet(null, radio, null, person);
+		bracelet = new Bracelet(null, radio, null, person, 0l);
 		person.setBracelet(bracelet);
 		person.setPosition(new Position(1, 1));
 		people.add(person);
 
 		person = new Person(7);
-		bracelet = new Bracelet(null, radio, null, person);
+		bracelet = new Bracelet(null, radio, null, person, 0l);
 		person.setBracelet(bracelet);
 		person.setPosition(new Position(7, 7));
 		people.add(person);
