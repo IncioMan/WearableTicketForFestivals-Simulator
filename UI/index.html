@@ -18,6 +18,16 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
         padding: 0px 0px 0px 16px;
       }
+      .box-value-variance{
+        font-family: Arial, Helvetica, sans-serif;
+        display: inline-block;
+        width: 90%;
+        height: 130px;
+        font-size: 11px;
+        margin: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        padding: 0px 0px 0px 16px;
+      }
       .canvas{
         margin-left: 24px;
         display: inline-block;
@@ -45,6 +55,12 @@
         padding-left: 28%;
         padding-top: 28px;
         font-size: 19px;
+      }
+      .value-variance{
+        padding-left: 10%;
+        padding-top: 28px;
+        font-size: 19px;
+        display: inline-block;
       }
     </style>
   </head>
@@ -88,9 +104,11 @@
           <h3>Total recent locations in DB:</h3>
           <h1 id="tprldb" class="value"></h1>
         </div>
-        <div class="total-title box-value">
-          <h3>Current recent locations in DB:</h3>
-          <h1 id="cprldb" class="value"></h1>
+        <div class="total-title box-value-variance">
+          <h3>Current recent locations in DB [max, avg, min]:</h3>
+          <h1 id="maxcprldb" class="value-variance"></h1>
+          <h1 id="cprldb" class="value-variance"></h1>
+          <h1 id="mincprldb" class="value-variance"></h1>
         </div>
         <div class="total-title box-value">
           <h3>Current people out of range:</h3>

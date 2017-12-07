@@ -1,6 +1,6 @@
 var bubbles = [];
-var person_width = 20;
-var person_height = 20;
+var person_width = 12;
+var person_height = 12;
 var guests = [];
 var concerts = [];
 var concertImg;
