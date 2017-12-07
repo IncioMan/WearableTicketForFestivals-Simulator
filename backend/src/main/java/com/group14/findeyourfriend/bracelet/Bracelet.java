@@ -2,6 +2,8 @@ package com.group14.findeyourfriend.bracelet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ThreadLocalRandom;
+
 import com.group14.common_interface.Position;
 import com.group14.common_interface.Vector2;
 import com.group14.findeyourfriend.Clock;
@@ -57,6 +59,7 @@ public class Bracelet {
 	protected long clockOffset;
 	private ConcertEvent event;
 	private boolean _timerMoveToEventRun;
+	private int clockDrift;
 
 	public Bracelet(Battery b, Radio r, CPU c, Person person, long clockOffset) {
 		battery = b;
@@ -74,6 +77,7 @@ public class Bracelet {
 		updateLedTime = 0.0001;
 		visualFeedBackCurrent_mA = 20;
 		visualFeedBackOnTime = 8000;
+		clockDrift = ThreadLocalRandom.current().nextInt(-10,11);
 	}
 
 	protected void RunBracelet() {
@@ -188,7 +192,7 @@ public class Bracelet {
 		CreateUpdateMessage();
 		// BroadcastMessages(updateMessagesToRelay);
 
-		battery.DecrementEnergy(cpu.cpuCurrentBroadcastAvg_mA, cpu.timerUpDelay);// Decrement battery from CPU for the
+		battery.DecrementEnergy(cpu.cpuCurrentBroadcastAvg_mA, cpu.timerCpDelay);// Decrement battery from CPU for the
 																					// entire CreateUpdateMessage
 		// TODO here is a crucial point. Should we decrement on a message basis or for
 		// the whole duration of the phase?
@@ -198,7 +202,7 @@ public class Bracelet {
 
 	protected void UpdateState() {
 		// DebugLog.log(person.getId() + ": Updating locations");
-		battery.DecrementEnergy(cpu.cpuCurrentRun_mA, 1000);
+		battery.DecrementEnergy(cpu.cpuCurrentRun_mA, 100);
 		// Some logic needed here
 		stateMachine.MoveNext(Command.Sleep);
 	}
@@ -415,26 +419,26 @@ public class Bracelet {
 
 	public void transition(long clock) {
 		clock = clock - clockOffset;
-		if (clock % cpu.timerCpDelay == 0) {
+		if (clock % (cpu.timerCpDelay + clockDrift) == 0) {
 			// Goto Communication phase
 			OnTimerCp();
 		}
-		if (clock % cpu.timerFDelay == 0 && _timerFRun) {
+		if (clock % (cpu.timerFDelay + clockDrift) == 0 && _timerFRun) {
 			// Goto
 			OnTimerF();
 		}
-		if (clock % cpu.timerMoveToEventDelay == 0 && _timerMoveToEventRun) {
+		if (clock % (cpu.timerMoveToEventDelay + clockDrift) == 0 && _timerMoveToEventRun) {
 			// Goto
 			OnTimerMoveToEvent();
 		}
-		if (clock % cpu.timerRCPDelay == 0 && _timerRCPRun) {
+		if (clock % (cpu.timerRCPDelay + clockDrift) == 0 && _timerRCPRun) {
 			//
 			OnTimerRCP();
 		}
-		if (clock % cpu.timerUpDelay == 0 && _timerUpRun) {
+		if (clock % (cpu.timerUpDelay + clockDrift) == 0 && _timerUpRun) {
 			OnTimerUp();
 		}
-		if (clock % cpu.timerLedDelay == 0 && _timerLedRun) {
+		if (clock % (cpu.timerLedDelay + clockDrift) == 0 && _timerLedRun) {
 			OnTimerLed();
 		}
 		// else battery.DecrementEnergy(cpu.cpuCurrentSleep_mA, 0.001);
