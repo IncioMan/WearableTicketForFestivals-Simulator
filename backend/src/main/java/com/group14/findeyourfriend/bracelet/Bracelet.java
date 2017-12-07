@@ -54,16 +54,17 @@ public class Bracelet {
 	protected double visualFeedBackCurrent_mA;
 	protected double visualFeedBackOnTime;
 
+	protected long clockOffset;
 	private ConcertEvent event;
 	private boolean _timerMoveToEventRun;
 
-	public Bracelet(Battery b, Radio r, CPU c, Person person) {
+	public Bracelet(Battery b, Radio r, CPU c, Person person, long clockOffset) {
 		battery = b;
 		radio = r;
 		this.person = person;
 		this.cpu = c;
 		stateMachine = new StateMachineProcess();
-
+		this.clockOffset = clockOffset;
 		DatabaseEntry dbE = new DatabaseEntry();
 		dbE.setPosition(getPosition());
 		dbE.setTimeStamp(Clock.getClock());
@@ -402,8 +403,8 @@ public class Bracelet {
 
 	}
 
-	public void transition(int clock) {
-
+	public void transition(long clock) {
+		clock = clock - clockOffset;
 		if (clock % cpu.timerCpDelay == 0) {
 			// Goto Communication phase
 			OnTimerCp();

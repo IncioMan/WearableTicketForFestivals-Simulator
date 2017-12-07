@@ -90,7 +90,7 @@ public class Simulation {
 
 		while (Clock.getClock() <= simulationTime) {
 			for (Person person : guests.values())
-				person.getBracelet().transition(Clock.getClock().intValue());
+				person.getBracelet().transition(Clock.getClock());
 
 			ArrayList<Event> events = timeEvents.getOrDefault(Clock.getClock().intValue(), new ArrayList<>());
 			for (Event e : events) {
@@ -133,7 +133,7 @@ public class Simulation {
 			if (SRSimulation)
 				bracelet = new SRBracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest);
 			else
-				bracelet = new Bracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest);
+				bracelet = new Bracelet(new Battery(battery.getCapacity_mAh()), radio, cpu, guest, Clock.getClock());
 			bracelet.Subscribe(broker);
 			guest.setBracelet(bracelet);
 
