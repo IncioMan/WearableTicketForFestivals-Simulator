@@ -130,8 +130,8 @@ public class Bracelet {
 						DatabaseEntry dbEntry = dataBase.get(_lookForPerson.getId());
 						if (person.getPosition().DistanceTo(dbEntry.getPosition()) > _proximity) {
 							// Decrement battery from CPU
-							battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);
-							person.GoTowards(dbEntry.getPosition());
+//							battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);
+//							person.GoTowards(dbEntry.getPosition());
 							setFound(false);
 							setGuiding(true);
 							// Update LEDS
