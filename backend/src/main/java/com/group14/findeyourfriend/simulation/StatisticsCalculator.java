@@ -87,7 +87,7 @@ public class StatisticsCalculator {
 				, totalPercentageRecentLocationsInDatabase.getRight()
 						+ currentPercentageRecentLocationsInDatabase.getCurrentValue().getRight());
 		percentagePeopleOutOfRange = calculatePercentagePeopleOutOfRange(guests);
-		if (Clock.getClock() % 4000 == 0) {
+		if (Clock.getClock() % 60000 == 0) {
 			percentagePeopleOutOfRangeOvertime.add(new Number[] { Clock.getClock(), getPercentagePeopleOutOfRange() });
 			currentAverageAgeInDatabaseOvertime
 					.add(new Number[] { Clock.getClock(), getCurrentAverageAgeInDatabase() });
@@ -397,5 +397,11 @@ public class StatisticsCalculator {
 			}
 		}
 		mapBraceletEvents.put(event.getKey().getId(), Pair.of(event.getRight(), Clock.getClock()));
+	}
+
+	@RequestMapping("/succeded-friend-search")
+	@CrossOrigin
+	public Integer getSuccededSearches() {
+		return avarageTimeToFindAFriend.getRight();
 	}
 }

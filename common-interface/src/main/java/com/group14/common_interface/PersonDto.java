@@ -57,4 +57,5 @@ public class PersonDto implements Serializable {
 	public void setRange(Number range) {
 		this.range = range;
 	}
+
 }

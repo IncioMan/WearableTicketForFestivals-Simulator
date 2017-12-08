@@ -26,11 +26,14 @@ class Concert{
 
 class Person{
 
-  constructor(id, X, Y, range, communicating){
+  constructor(id, X, Y, range, communicating, listening, responsing, requesting){
     this.id = id;
     this.X = X;
     this.Y = Y;
     this.communicating = communicating;
+    this.requesting = requesting;
+    this.listening = listening;
+    this.responsing = responsing;
     this.rangeRadius = range;
     this.rangeCounter = 0;
     this.col = 'white';
@@ -43,12 +46,20 @@ class Person{
       noStroke();
       fill('black');
       textSize(20);
-      text(this.id, this.X - person_width/4, this.Y - person_height/4, person_width, person_height);
+      text(this.id, this.X - person_width/4, this.Y - person_height/4, 20, 20);
       noFill();
+      stroke('black');
       if(this.communicating){
         stroke('#40C4FF');
-      }else{
-        stroke('black');
+      }
+      if(this.requesting){
+        stroke('red');
+      }
+      if(this.responsing){
+        stroke('green');
+      }
+      if(this.listening){
+        stroke('yellow');
       }
       //this.rangeCounter += 2;
       //this.rangeCounter = this.rangeCounter % this.rangeRadius;
@@ -57,7 +68,7 @@ class Person{
       //
       //ellipse(this.X,this.Y,this.rangeCounter/2,this.rangeCounter/2);
       //ellipse(this.X,this.Y,this.rangeCounter,this.rangeCounter);
-      ellipse(this.X,this.Y,this.rangeRadius,this.rangeRadius);
+      ellipse(this.X,this.Y,this.rangeRadius*2,this.rangeRadius*2);
     }
 
     clicked(){
@@ -74,7 +85,7 @@ function setup() {
   // Move the canvas so it's inside our <div id="sketch-holder">.
   canvas.parent('sketch-holder');
   noStroke();
-  concertImg = loadImage("stage.png");
+  concertImg = loadImage("https://d30y9cdsu7xlg0.cloudfront.net/png/106417-200.png");
 
   // for(var i = 0; i < 800; i++){
   //   guests.push(new Person(i, random(1200), random(800) + 200, 55, random(1) > .5));
@@ -109,7 +120,7 @@ window.setInterval(function(){
 function drawGuests(people) {
   guests = [];
   people.forEach(function(p){
-      guests.push(new Person(p.id, p.position.coordinates.x, p.position.coordinates.y, p.range, p.communicating));
+      guests.push(new Person(p.id, p.position.coordinates.x, p.position.coordinates.y, p.range, p.communicating, p.listening, p.responsing, p.requesting));
   });
 }
 

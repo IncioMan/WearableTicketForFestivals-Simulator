@@ -27,10 +27,11 @@ window.setInterval(function(){
   loadJSON('http://localhost:8080/min-current-percentage-recent-locations-in-db', (json) => {$('#mincprldb').text(Number(json).toFixed(2) + '%')});
   loadJSON('http://localhost:8080/current-percentage-people-out-of-range', (json) => {$('#cpoor').text(Number(json).toFixed(2) + '%')});
   loadJSON('http://localhost:8080/failed-friend-search', (json) => {$('#fs').text(Number(json).toFixed(2) + '')});
-    loadJSON('http://localhost:8080/event', (json) => {
-      console.log(json);
-      if(json){
-        $('#events').html(json.description + ' </br> ' + $('#events').html());
-      }
-    });
+  loadJSON('http://localhost:8080/succeded-friend-search', (json) => {$('#ss').text(Number(json).toFixed(2) + '')});
+  loadJSON('http://localhost:8080/event', (json) => {
+    console.log(json);
+    if(json){
+      $('#events').html(json.description + ' </br> ' + $('#events').html());
+    }
+  });
 }, 500);

@@ -2,6 +2,7 @@ package com.group14.findeyourfriend.bracelet;
 
 import java.util.ArrayList;
 
+import com.group14.findeyourfriend.Clock;
 import com.group14.findeyourfriend.chart.Chart;
 import com.group14.findeyourfriend.debug.DebugLog;
 import com.group14.findeyourfriend.message.Message;
@@ -15,7 +16,7 @@ import javafx.scene.chart.XYChart;
 
 public class SRBracelet extends Bracelet {
 
-    private SearchRequest requestToBroadcast;
+	private SearchRequest requestToBroadcast;
 	private ArrayList<Message> requestsToRelay = new ArrayList<>();
 	private ArrayList<Message> responsesToRelay = new ArrayList<>();
 	private ArrayList<Message> responsesToBroadcast = new ArrayList<>();
@@ -73,6 +74,35 @@ public class SRBracelet extends Bracelet {
 		}
 	}
 
+	@Override
+	protected void SLookupState() {
+		// Some logic for actually looking up a friend
+		synchronized (_dbLock) {
+			DebugLog.log(person.getId() + ": Looking up location in my DB");
+			if (_lookForPerson != null) {
+				battery.DecrementEnergy(cpu.cpuCurrentRun_mA, 1000);
+				if (dataBase.containsKey(_lookForPerson.getId())) {
+					// TODO implement if(!recentEnough) then it is not found
+					if (Clock.isRecentEnough(dataBase.get(_lookForPerson.getId()))) {
+						setGuiding(true);
+						setFound(false);
+						stateMachine.MoveNext(Command.FriendFound);
+						DebugLog.log(person.getId() + ": Found recent location in my DB");
+					} else {
+						DebugLog.log(person.getId() + ": Found obsolete location in my DB");
+						// broker.notifyEvent(getPerson(), BraceletEvent.FRIEND_NOT_FOUND_IN_DB);
+						stateMachine.MoveNext(Command.FriendNotFound);
+					}
+				} else {
+					DebugLog.log(person.getId() + ": Did not find person in my DB");
+					// broker.notifyEvent(getPerson(), BraceletEvent.FRIEND_NOT_FOUND_IN_DB);
+					stateMachine.MoveNext(Command.FriendNotFound);
+				}
+				RunBracelet();
+			}
+		}
+	}
+
 	private void ResponseState() {
 		timerRRPRun = true;
 		timerDRPRun = true;
@@ -120,11 +150,13 @@ public class SRBracelet extends Bracelet {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.INTERPRET_STATE) {
 				if (dataBase.containsKey(_lookForPerson.getId())) {
-					DebugLog.log(person.getId() + ": Received search response");
+					DebugLog.log(person.getId() + ": Received search response for person " + _lookForPerson.getId());
+					broker.notifyEvent(this.getPerson(), BraceletEvent.FRIEND_FOUND_IN_DB);
 					stateMachine.MoveNext(Command.FriendFound); // to LED phase
 					RunBracelet();
 				} else {
 					DebugLog.log(person.getId() + ": No search responses received");
+					broker.notifyEvent(this.getPerson(), BraceletEvent.FRIEND_NOT_FOUND_IN_DB);
 					stateMachine.MoveNext(Command.FriendNotFound); // to Sleep
 					RunBracelet();
 				}
@@ -148,7 +180,7 @@ public class SRBracelet extends Bracelet {
 
 	@Override
 	public void transition(long clock) {
-		clock =  clock - clockOffset;
+		clock = clock - clockOffset;
 		if (clock % cpu.timerCpDelay == 0) {
 			// Goto Communication phase
 			OnTimerCp();
@@ -199,11 +231,11 @@ public class SRBracelet extends Bracelet {
 			OnTimerRQP();
 		}
 
-        if (clock % 60000 == 0) {
-            ArrayList<XYChart.Data> dataPoints = Chart.DataPointsMap.getOrDefault(person.getId(), new ArrayList<>());
-            dataPoints.add(new XYChart.Data(clock / 60000, battery.getEnergyLeft())); // every "minute" new datapoint
-            Chart.DataPointsMap.putIfAbsent(person.getId(), dataPoints);
-        }
+		if (clock % 60000 == 0) {
+			ArrayList<XYChart.Data> dataPoints = Chart.DataPointsMap.getOrDefault(person.getId(), new ArrayList<>());
+			dataPoints.add(new XYChart.Data(clock / 60000, battery.getEnergyLeft())); // every "minute" new datapoint
+			Chart.DataPointsMap.putIfAbsent(person.getId(), dataPoints);
+		}
 
 	}
 
@@ -221,9 +253,9 @@ public class SRBracelet extends Bracelet {
 	private void BroadcastSearchRequest() {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.REQUEST_STATE) {
-				if(requestToBroadcast == null)
-			        requestToBroadcast = new SearchRequest(this, _lookForPerson.getId());
-                broker.DoBroadcast(this, getPosition(), radio.getRange_M(), requestToBroadcast);
+				if (requestToBroadcast == null)
+					requestToBroadcast = new SearchRequest(this, _lookForPerson.getId());
+				broker.DoBroadcast(this, getPosition(), radio.getRange_M(), requestToBroadcast);
 			}
 		}
 	}
@@ -243,11 +275,11 @@ public class SRBracelet extends Bracelet {
 	private void BroadcastSearchResponses() {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.RESPONSE_STATE) {
-				if(!responsesToBroadcast.isEmpty()){
-                    DebugLog.log(person.getId() + ": Broadcasting search responses");
-                    for (Message msg : responsesToBroadcast)
-                        broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
-                }
+				if (!responsesToBroadcast.isEmpty()) {
+					DebugLog.log(person.getId() + ": Broadcasting search responses");
+					for (Message msg : responsesToBroadcast)
+						broker.DoBroadcast(this, getPosition(), radio.getRange_M(), msg);
+				}
 			}
 		}
 	}
@@ -256,14 +288,14 @@ public class SRBracelet extends Bracelet {
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.LISTEN_STATE) {
 				DebugLog.logTimer(person.getId() + ": OnTimerRLP");
-				if(!requestsToRelay.isEmpty()){
-                    DebugLog.log(person.getId() + ": Relaying search requests");
-				    BroadcastMessages(requestsToRelay);
-                }
-                if(!responsesToRelay.isEmpty()){
-                    DebugLog.log(person.getId() + ": Relaying search responses");
-				    BroadcastMessages(responsesToRelay);
-                }
+				if (!requestsToRelay.isEmpty()) {
+					DebugLog.log(person.getId() + ": Relaying search requests");
+					BroadcastMessages(requestsToRelay);
+				}
+				if (!responsesToRelay.isEmpty()) {
+					DebugLog.log(person.getId() + ": Relaying search responses");
+					BroadcastMessages(responsesToRelay);
+				}
 			}
 		}
 	}
@@ -312,7 +344,7 @@ public class SRBracelet extends Bracelet {
 
 		synchronized (_stateLock) {
 			if (stateMachine.getCurrentState() == ProcessState.REQUEST_STATE) {
-                requestToBroadcast = null;
+				requestToBroadcast = null;
 				requestsToRelay = new ArrayList<>();
 				responsesToRelay = new ArrayList<>();
 				DebugLog.logTimer(person.getId() + ": OnTimerIP");

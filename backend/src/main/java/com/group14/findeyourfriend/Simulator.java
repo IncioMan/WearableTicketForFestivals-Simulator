@@ -39,7 +39,7 @@ public class Simulator {
 		new Thread(() -> {
 			try {
 				Thread.sleep(5000);
-				boolean runSR = false;
+				boolean runSR = true;
 				InputStream eventStream;
 				InputStream paramStream;
 				if (!runSR) {
@@ -53,7 +53,7 @@ public class Simulator {
 				Queue<Parameters> params = ParameterParser.parse(paramStream, runSR);
 				simulation.add(calculator::calculate);
 				simulation.addEventListener(calculator::braceletEvent);
-				simulation.init(events, runSR, 3600000);// Simulate 1 hour in ms
+				simulation.init(events, runSR, 7000000);// Simulate 1 hour in ms
 				simulation.run(params.poll());
 				// Chart.main(new String[0]);// Show chart
 			} catch (Exception e) {
