@@ -112,6 +112,8 @@ public class ParameterParser {
 			c.timerRQPDelay = Integer.parseInt(words[13]);
 			c.timerRRPDelay = Integer.parseInt(words[14]);
 			c.timerRLPDelay = Integer.parseInt(words[15]);
+			// concert event
+			c.timerMoveToEventDelay = Integer.parseInt(words[16]);
 			return c;
 
 		} catch (Exception e) {

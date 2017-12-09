@@ -185,48 +185,51 @@ public class SRBracelet extends Bracelet {
 			// Goto Communication phase
 			OnTimerCp();
 		}
-		if (clock % cpu.timerFDelay == 0 && _timerFRun) {
+		if (clock % (cpu.timerFDelay + clockDrift) == 0 && _timerFRun) {
 			// Goto
 			OnTimerF();
 		}
-		if (clock % cpu.timerRCPDelay == 0 && _timerRCPRun) {
+		if (clock % (cpu.timerRCPDelay + clockDrift) == 0 && _timerRCPRun) {
 			// Rebroadcast
 			OnTimerRCP();
 		}
-		if (clock % cpu.timerUpDelay == 0 && _timerUpRun) {
+		if (clock % (cpu.timerUpDelay + clockDrift) == 0 && _timerUpRun) {
 			OnTimerUp();
 		}
-		if (clock % cpu.timerLedDelay == 0 && _timerLedRun) {
+		if (clock % (cpu.timerLedDelay + clockDrift) == 0 && _timerLedRun) {
 			OnTimerLed();
 		}
-
-		if (clock % cpu.timerIPDelay == 0 && timerIPRun) {
+		if (clock % (cpu.timerMoveToEventDelay + clockDrift) == 0 && _timerMoveToEventRun) {
+			// Goto
+			OnTimerMoveToEvent();
+		}
+		if (clock % (cpu.timerIPDelay + clockDrift) == 0 && timerIPRun) {
 			OnTimerIP();
 		}
 
-		if (clock % cpu.timerLPDelay == 0) {
+		if (clock % (cpu.timerLPDelay + clockDrift) == 0) {
 			OnTimerLP();
 		}
 
-		if (clock % cpu.timerDLPDelay == 0 && timerDLPRun) {
+		if (clock % (cpu.timerDLPDelay + clockDrift) == 0 && timerDLPRun) {
 			OnTimerDLP();
 		}
 
-		if (clock % cpu.timerDRPDelay == 0 && timerDRPRun) {
+		if (clock % (cpu.timerDRPDelay + clockDrift) == 0 && timerDRPRun) {
 			OnTimerDRP();
 		}
 
-		if (clock % cpu.timerRLPDelay == 0 && timerRLPRun) {
+		if (clock % (cpu.timerRLPDelay + clockDrift) == 0 && timerRLPRun) {
 			// Rebroadcast
 			OnTimerRLP();
 		}
 
-		if (clock % cpu.timerRRPDelay == 0 && timerRRPRun) {
+		if (clock % (cpu.timerRRPDelay + clockDrift) == 0 && timerRRPRun) {
 			// Rebroadcast
 			OnTimerRRP();
 		}
 
-		if (clock % cpu.timerRQPDelay == 0 && timerRQPRun) {
+		if (clock % (cpu.timerRQPDelay + clockDrift) == 0 && timerRQPRun) {
 			// Rebroadcast
 			OnTimerRQP();
 		}

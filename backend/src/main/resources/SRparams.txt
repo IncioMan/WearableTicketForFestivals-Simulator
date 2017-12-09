@@ -1,10 +1,12 @@
 # Radio range, passiveconsumtion, activeconsumption_mA, receivingconsumption_mA
 # http://www.ti.com/product/CC2640R2F/datasheet
-R 350 0.00 9.3 5.9
+R 60 0.00 9.3 5.9
 # CPU cpuCurrentSleep_mA, cpuCurrentRun_mA, cpuCurrentBroadcastAvg_mA, cpuCurrentConnectedAvg_mA, timerCpDelay, timerFDelay, timerLedDelay, timerRDelay, timerUpDelay,
-# timerIPdelay, timerLPdelay, timerDLPDelay, timerDRPDelay, timerRQP, timerRRP, timerRLP
+# timerIPdelay, timerLPdelay, timerDLPDelay, timerDRPDelay, timerRQP, timerRRP, timerRLP, timerMoveToEventDelay
+# interpret phase, listening phase, duration listening phase?, duration request phase?, request phase, request rebradcast phase?, request listening phase
 # http://www.ti.com/product/CC2640R2F/datasheet
 # running 48MHz
-C 0.00011 0.3 0.037 0.354 60000 500 8000 500 3000 10000 4000 3000 1000 500 500 500
+#C 0.00011 0.3 0.037 0.354 1000 500 500 100 500 1000 100000 500 5000 3000 500 500 5000 500
+C 0.00011 0.3 0.037 0.354 10000000 500 100 500 1000 1000000 500 3000 1000 500 500 5000 500
 # running 24MHz and only broadcasting every 20s
 # C 0.00011 0.15 0.0185 0.354 20000 500 8000 100 1000

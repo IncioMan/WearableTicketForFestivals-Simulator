@@ -58,8 +58,8 @@ public class Bracelet {
 
 	protected long clockOffset;
 	private ConcertEvent event;
-	private boolean _timerMoveToEventRun;
-	private int clockDrift;
+	protected boolean _timerMoveToEventRun;
+	protected int clockDrift;
 
 	public Bracelet(Battery b, Radio r, CPU c, Person person, long clockOffset) {
 		battery = b;
@@ -77,7 +77,7 @@ public class Bracelet {
 		updateLedTime = 0.0001;
 		visualFeedBackCurrent_mA = 20;
 		visualFeedBackOnTime = 8000;
-		clockDrift = ThreadLocalRandom.current().nextInt(-10,11);
+		clockDrift = ThreadLocalRandom.current().nextInt(-10, 11);
 	}
 
 	protected void RunBracelet() {
@@ -130,8 +130,8 @@ public class Bracelet {
 						DatabaseEntry dbEntry = dataBase.get(_lookForPerson.getId());
 						if (person.getPosition().DistanceTo(dbEntry.getPosition()) > _proximity) {
 							// Decrement battery from CPU
-//							battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);
-//							person.GoTowards(dbEntry.getPosition());
+							// battery.DecrementEnergy(cpu.cpuCurrentRun_mA, updateLedTime);
+							// person.GoTowards(dbEntry.getPosition());
 							setFound(false);
 							setGuiding(true);
 							// Update LEDS
@@ -396,11 +396,11 @@ public class Bracelet {
 		dbE.setTimeStamp(Clock.getClock());
 		dataBase.put(person.getId(), dbE);
 		HashMap<Integer, DatabaseEntry> tempDataBase = new HashMap<>();
-		for (int id: dataBase.keySet()) {
-			if(tempDataBase.size() < 30){ //Only send the first 30 that satisfy the recent data threshold
-				DatabaseEntry entry =  dataBase.get(id);
-				if (Clock.getClock() - entry.getTimeStamp() < Constants.RECENT_DATA_THRESHOLD){
-					tempDataBase.put(id,entry);
+		for (int id : dataBase.keySet()) {
+			if (tempDataBase.size() < 30) { // Only send the first 30 that satisfy the recent data threshold
+				DatabaseEntry entry = dataBase.get(id);
+				if (Clock.getClock() - entry.getTimeStamp() < Constants.RECENT_DATA_THRESHOLD) {
+					tempDataBase.put(id, entry);
 				}
 			}
 
@@ -450,7 +450,7 @@ public class Bracelet {
 		}
 	}
 
-	private void OnTimerMoveToEvent() {
+	protected void OnTimerMoveToEvent() {
 		if (stateMachine.getCurrentState() == ProcessState.SLEEP_STATE) {
 			DebugLog.logTimer(person.getId() + ": OnTimerMoveToEvent");
 			if (event != null) {
