@@ -24,8 +24,8 @@ Open the terminal in the root folder and run the following command
 
 The simulator can simulate two communication algorithms:
 
-* Broadcast
-* Search Request
+* Broadcast ([video](https://www.youtube.com/watch?v=M3T-7G0hFfM&index=2&list=UUVtdSuG76pmr0tgl--oJcCQ))
+* Search Request ([video](https://www.youtube.com/watch?v=a4ASGlVInRo&index=1&list=UUVtdSuG76pmr0tgl--oJcCQ))
 
 More on this in the paper.
 
